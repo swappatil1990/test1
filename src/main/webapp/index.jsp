@@ -1,3 +1,11 @@
+<%@page import="org.bson.Document"%>
+<%@page import="com.mongodb.client.MongoCollection"%>
+<%@page import="com.mongodb.client.MongoDatabase"%>
+<%@page import="com.mongodb.client.MongoClients"%>
+<%@page import="com.mongodb.client.MongoClient"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+    
 <!doctype html>
 <html lang="en">
 <head>
@@ -216,6 +224,17 @@ pre {
 
 <section class='container'>
           <hgroup>
+          
+<%
+
+
+MongoClient mongoClient= MongoClients.create("mongodb://swap:wws2RZ1bJia6KYS4@mycluster-shard-00-00-ko8ql.mongodb.net:27017,mycluster-shard-00-01-ko8ql.mongodb.net:27017,mycluster-shard-00-02-ko8ql.mongodb.net:27017/test?ssl=true&replicaSet=MyCluster-shard-0&authSource=admin&retryWrites=true");
+MongoDatabase database = mongoClient.getDatabase("mydb");
+MongoCollection<Document> coll = database.getCollection("mydbcollections");
+System.out.print("coll "+coll.count());
+out.write("coll "+coll.count());
+%>
+
             <h1>swap Welcome to your JavaEE application on OpenShift</h1>
           </hgroup>
 

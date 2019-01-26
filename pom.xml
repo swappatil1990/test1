@@ -5,7 +5,7 @@
     <groupId>SampleApp</groupId>
     <artifactId>SampleApp</artifactId>
     <packaging>war</packaging>
-    <version>1.0</version>
+    <version>1.2</version>
     <name>SampleApp</name>
   
     <properties>
@@ -21,6 +21,11 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+        	<groupId>org.mongodb</groupId>
+        		<artifactId>mongodb-driver-sync</artifactId>
+        	<version>3.8.2</version>
+   	 	</dependency>
     </dependencies>
 
 <profiles>
