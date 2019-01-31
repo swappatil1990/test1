@@ -1,3 +1,4 @@
+<%@page import="idream2.main.core.RelationData"%>
 <%@page import="idream2.main.core.ObjectType"%>
 <%@page import="idream2.main.core.RelationType"%>
 <%@page import="idream2.main.core.Util"%>
@@ -23,11 +24,32 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Welcome to OpenShift</title>
+  <script>
+	function httpGet(theUrl)
+	{
+	    var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+	    xmlHttp.send( null );
+	    
+	    document.getElementById("outputBox").value = document.getElementById("outputBox").value +"\n"+ xmlHttp.responseText;
+	}
+  	function executeCommand(x)
+  	{
+  		httpGet("http://localhost:8080/SampleApp/executeCommand.jsp?command="+document.getElementById("queryTextbox").value);
+	}
+  	function clearBox()
+  	{
+  		document.getElementById("outputBox").value="";
+	}
+  </script>
 </head>
 <body>
 <section class='container'>
-          <hgroup>
-          
+         <input type="text" value="" name="queryTextbox" id="queryTextbox" style="width:700px">
+         <input type="button" value="Run" onclick="executeCommand(this)">
+         <br/><br/>
+         <textarea id="outputBox" cols=150 rows="30" readonly>
+         </textarea><input type="button" value="Clear" onclick="clearBox()">
 <%
 //Map<String,Object> mData=new HashMap<String,Object>();
 //mData.put("name","MongoDB4");
@@ -53,11 +75,12 @@ try
 	//ObjectType.addElement("ManContact", "Admin", "", "Manager", "", 5);
 	//ObjectType.removeElement("Employee", "EmpContact");
 	//ObjectType.delete("Student");
-	//Document doc=new Document();
-	//doc.append("contact", "1233");
-	//doc.append("address", "Pune3");
-	//doc.append("gender", "male3");
-	//doc.append("state", "maha3");
+	Document doc=new Document();
+	doc.append("contact", "4444");
+	doc.append("address", "Nashik");
+	doc.append("gender", "Male");
+	doc.append("state", "maha3");
+	//ObjectData.insert("Employee","Rahul","1", doc);
 	//ObjectData.update("Manager","Amol","1", doc);
 	//ObjectData.delete("Manager","Amol","1");
 	//Document docxx = ObjectData.getData("Manager","Amol","1");
@@ -70,7 +93,17 @@ try
 	//RelationType.addElement("ManagerEmp", "String", "", "ManagerEmp", "", 10);
 	//RelationType.create("ManagerEmp", "Admin", "", "float");
 	//RelationType.delete("ManagerEmp");
-	RelationType.addToObjects("ManagerEmp", "Employee");
+	//RelationType.addToObjects("ManagerEmp", "Employee");
+	//RelationType.addFromObjects("ManagerEmp", "Manager");
+	//RelationType.removeToObjects("ManagerEmp", "Employee");
+	//RelationType.removeFromObjects("ManagerEmp", "Manager");
+	//Document docRel=new Document();
+	//docRel.append("qty", "2");
+	//RelationData.connect("Manager","Amol","1", "Employee","Rahul","1", "ManagerEmp", docRel);
+	//RelationData.disconnect("Manager","Amol","1", "Employee","Rahul","1", "ManagerEmp");
+	
+	//RelationData.update("Manager","Amol","1", "Employee","Rahul","1", "ManagerEmp", docRel);
+	//Util.clearAllCustomData();
 }
 catch(Exception e)
 {

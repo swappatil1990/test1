@@ -9,9 +9,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.MongoIterable;
 
-public class Util {
+public class Util extends Constants{
 	static MongoDatabase database=null;
 	public static void connectedDB()
 	{
@@ -24,7 +24,7 @@ public class Util {
 		}
 	}
 	
-	public static void insert(String strTable, Document doc)
+	public static void insert(String strTable, Document doc) throws Exception
 	{
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
@@ -37,7 +37,7 @@ public class Util {
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		
-		collection.deleteOne(new Document("_id", new ObjectId(strDataId)));
+		collection.deleteOne(new Document(ID, new ObjectId(strDataId)));
 	}
 	
 	public static void delete(String strDataId, String strElementName, String strTable)
@@ -49,52 +49,59 @@ public class Util {
 		collection.deleteOne(find);
 	}
 	
-	public static void update(String strDataId, String strTable, Document mData)
+	public static void update(String strDataId, String strTable, Document mData) throws Exception
 	{
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
-		
-		collection.updateOne(new Document("_id", new ObjectId(strDataId)), new Document("$set", mData));
+		collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document(SET, mData));
 	}
 	
-	public static void update(String strDataId, String strElementName, String strTable, Document mData)
+	public static void update(String strDataId, String strElementName, String strTable, Document mData) throws Exception
 	{
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		BasicDBObject find = new BasicDBObject();
 	    find.put(strElementName, new ObjectId(strDataId));
-		collection.updateOne(find, new Document("$set", mData));
+		collection.updateOne(find, new Document(SET, mData));
 	}
 	
-	public static Document print(String strDataId, String strTable)
+	public static Document print(String strDataId, String strTable) throws Exception
 	{
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		
-		FindIterable<Document> collectionResult = collection.find(new Document("_id", new ObjectId(strDataId)));
+		FindIterable<Document> collectionResult = collection.find(new Document(ID, new ObjectId(strDataId)));
+		if(collectionResult!=null)
+			return collectionResult.first();
+		else
+			throw new Exception("Error... Data not found in print.");
 		
-		return collectionResult.first();
 	}
 	
-	public static Document find(String strTable, BasicDBObject findCondition)
+	public static Document find(String strTable, BasicDBObject findCondition) throws Exception
 	{
 		connectedDB();
 		
+		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		FindIterable<Document> collectionResult = collection.find(findCondition);
+		if(collectionResult!=null)
+			return collectionResult.first();
+		else
+			throw new Exception("Error... Data not found in find.");
+	}
+	
+	public static FindIterable<Document> findMany(String strTable, BasicDBObject findCondition) throws Exception
+	{
+		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		
 		FindIterable<Document> collectionResult = collection.find(findCondition);
 		
-		return collectionResult.first();
-	}
-	
-	public static FindIterable<Document> findMany(String strTable, BasicDBObject findCondition)
-	{
-		connectedDB();
-		MongoCollection<Document> collection = database.getCollection(strTable);
-		
-		FindIterable<Document> collectionResult = collection.find(findCondition);
-		
-		return collectionResult;
+		if(collectionResult!=null)
+			return collectionResult;
+		else
+			throw new Exception("Error... Data not found in find.");
 	}
 	
 	public static void createCollection(String strCollectionName)
@@ -115,15 +122,38 @@ public class Util {
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strCollectionName);
 	    BasicDBObject find = new BasicDBObject();
-	    find.put("objectName", strId);
+	    find.put(FIELD_OBJECTNAME, strId);
 	    BasicDBObject update = new BasicDBObject();
-	    update.put("$inc", new BasicDBObject(strColumnName, 1));
+	    update.put(INC, new BasicDBObject(strColumnName, 1));
 	    Document obj =  collection.findOneAndUpdate(find, update);
-	    return obj.get(strColumnName);
+	    if(obj!=null)
+	    	return obj.get(strColumnName);
+	    else
+	    	throw new Exception("Error... Data not found in getNextSequence.");
 	}
 	
 	public static int getObjectDataSequence(String strObjectName) throws Exception{
-		int cnt=(int) getNextSequence("id_Objects", strObjectName, "currentAutoNumber");
+		int cnt=(int) getNextSequence(COLLECTION_ID_OBJECTS, strObjectName, FIELD_CURRENTAUTONUMBER);
 	    return cnt;
+	}
+	
+	public static void clearAllCustomData()
+	{
+		connectedDB();
+		MongoIterable<String> collectionList = database.listCollectionNames();
+		for(String str:collectionList)
+		{
+			if(str.indexOf("id_")>-1)
+			{
+				BasicDBObject document = new BasicDBObject();
+				//document.append("dataType", "Admin");
+				database.getCollection(str).deleteMany(document);
+			}
+			else
+			{
+				deleteCollection(str);
+			}
+		}
+		
 	}
 }
