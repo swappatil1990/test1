@@ -35,7 +35,7 @@
 	}
   	function executeCommand(x)
   	{
-  		httpGet("http://localhost:8080/SampleApp/executeCommand.jsp?command="+document.getElementById("queryTextbox").value);
+  		httpGet( window.location.href+"/executeCommand.jsp?command="+document.getElementById("queryTextbox").value);
 	}
   	function clearBox()
   	{
