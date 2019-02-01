@@ -54,6 +54,11 @@ public class ObjectType extends Constants{
 	
 	public static void create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength) throws Exception
 	{
+		create(strName, strType, strDescription, strPrefix, currentAutoNum, strSuffix, numLength, false);
+	}
+	
+	public static void create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength, boolean flagAdmin) throws Exception
+	{
 		BasicDBObject find = new BasicDBObject();
 	    find.put(FIELD_OBJECTNAME, strName);
 		Document docCheck=Util.find(COLLECTION_ID_OBJECTS,find);
@@ -72,11 +77,17 @@ public class ObjectType extends Constants{
 			doc.put(FIELD_STATEFLOW, "");
 			doc.put(FIELD_STATUS, VALUE_ACTIVE);
 			Util.insert(COLLECTION_ID_OBJECTS, doc);
-			
-			Util.createCollection(PREFIX_SCHEMA+strName);
-			Util.createCollection(PREFIX_SCHEMAREV+strName);
-			Util.createCollection(PREFIX_SCHEMAREVOBJ+strName);
-			Util.createCollection(PREFIX_HIST_SCHEMA+strName);
+			if(!flagAdmin)
+			{
+				Util.createCollection(PREFIX_SCHEMA+strName);
+				Util.createCollection(PREFIX_SCHEMAREV+strName);
+				Util.createCollection(PREFIX_SCHEMAREVOBJ+strName);
+				Util.createCollection(PREFIX_HIST_SCHEMA+strName);
+			}
+			else
+			{
+				Util.createCollection(PREFIX_ID+strName);
+			}
 		}
 		else
 			throw new Exception("Error... Object "+strName+" is already exist.");
@@ -84,12 +95,21 @@ public class ObjectType extends Constants{
 	
 	public static void delete(String strName) throws Exception
 	{
+		delete(strName, false);
+	}
+	public static void delete(String strName, boolean flagAdmin) throws Exception
+	{
 		Object DataId= getId(strName);
 		Util.delete(DataId.toString(), COLLECTION_ID_OBJECTS);
-		Util.deleteCollection(PREFIX_SCHEMA+strName);
-		Util.deleteCollection(PREFIX_SCHEMAREV+strName);
-		Util.deleteCollection(PREFIX_SCHEMAREVOBJ+strName);
-		Util.deleteCollection(PREFIX_HIST_SCHEMA+strName);
+		if(!flagAdmin)
+		{
+			Util.deleteCollection(PREFIX_SCHEMA+strName);
+			Util.deleteCollection(PREFIX_SCHEMAREV+strName);
+			Util.deleteCollection(PREFIX_SCHEMAREVOBJ+strName);
+			Util.deleteCollection(PREFIX_HIST_SCHEMA+strName);
+		}
+		else
+			Util.deleteCollection(PREFIX_ID+strName);
 	}
 	
 	public static Object getId(String strObjectName) throws Exception

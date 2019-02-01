@@ -1,23 +1,3 @@
-<%@page import="idream2.main.core.RelationData"%>
-<%@page import="idream2.main.core.ObjectType"%>
-<%@page import="idream2.main.core.RelationType"%>
-<%@page import="idream2.main.core.Util"%>
-<%@page import="idream2.main.core.ObjectData"%>
-<%@page import="org.bson.Document"%>
-<%@page import="com.mongodb.client.MongoCollection"%>
-<%@page import="com.mongodb.client.MongoDatabase"%>
-<%@page import="com.mongodb.client.MongoClients"%>
-<%@page import="com.mongodb.client.MongoClient"%>
-<%@page import="java.util.Map"%>
-<%@page import="java.util.Set"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="org.bson.Document"%>
-<%@page import="com.mongodb.BasicDBObject"%>
-<%@page import="com.mongodb.client.model.Filters"%>
-
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-    
 <!doctype html>
 <html lang="en">
 	<head>
@@ -65,6 +45,7 @@
 			  background: #34495e;
 			  width: 100%;
 			  border: 0;
+			  margin: 0 0 15px;
 			  padding: 15px;
 			  color: #FFFFFF;
 			  font-size: 14px;
@@ -135,18 +116,11 @@
 	<body>
 		<div class="login-page">
 		  <div class="form">
-		    <form class="register-form" action="" method="">
-		      <input type="text" placeholder="name"/>
-		      <input type="password" placeholder="password"/>
-		      <input type="text" placeholder="email address"/>
-		      <button>create</button>
-		      <p class="message">Already registered? <a href="#" onclick="">Sign In</a></p>
-		    </form>
-		    <form class="login-form" action="loginValidate.jsp" method="post" >
-		      <input type="text" placeholder="username" name="username"/>
-		      <input type="password" placeholder="password" name="password"/>
-		      <button type="submit">login</button>
-		      <p class="message">Not registered? <a href="#">Create an account</a></p>
+		    <form class="login-form" action="../../home.jsp" method="post" >
+		      <button type="submit">Administrator Portal</button>
+		      </form>
+		       <form class="login-form" action="../../home.jsp" method="post">
+		      <button type="submit">Customer Portal</button>
 		    </form>
 		  </div>
 		</div>

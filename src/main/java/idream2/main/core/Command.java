@@ -355,15 +355,30 @@ public class Command {
 					output = output + "       > " + "Error... Required admin access only";
 				}
 			}
+			else if(arrOperation[0].trim().equals("login"))
+			{
+				if(arrOperation.length>2 && arrOperation[2].trim().equals("help"))
+				{
+					output = output + "       > " + "login~;";
+				}
+				else
+				{
+					Context cont=new Context();
+					String strContext=cont.login(arrParamData[0].trim(), arrParamData[1].trim());
+					if(strContext!=null)
+						output =output +"       > " + "Login successfully";
+					else
+						output = output + "       > " + "Error... Login faild.";
+				}
+			}
 			else if(arrOperation[0].trim().equals("help"))
 			{
-				output = output + "       > " + "add \ndelete \nupdate \nprint \nclearAll";
+				output = output + "       > " + "add \ndelete \nupdate \nprint \nclearAll\n login";
 			}
-			
 		}
 		catch (Exception e) {
 			System.out.println("Error... "+e);
-			output = output + "       > " + e;
+			output = output + "       > " + e.getMessage();
 		}
 		return output;
 	}

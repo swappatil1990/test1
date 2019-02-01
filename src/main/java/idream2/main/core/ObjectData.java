@@ -8,6 +8,11 @@ import com.mongodb.BasicDBObject;
 public class ObjectData extends Constants{
 	public static void insert(String strObjectName, String strDataName, String strVersion, Document doc) throws Exception
 	{
+		insert(strObjectName, strDataName, strVersion, doc, false);
+	}
+	
+	public static void insert(String strObjectName, String strDataName, String strVersion, Document doc, boolean flagAdmin) throws Exception
+	{
 		Object objectId = ObjectType.getId(strObjectName);
 		Document docCheck = getDocument(strObjectName, strDataName, strVersion);
 		
@@ -23,8 +28,10 @@ public class ObjectData extends Constants{
 			Document docId = getDocument(strObjectName, strDataName, strVersion);
 			
 			doc.append(FIELD_OBJECTID, docId.getObjectId(ID));
-			
-			Util.insert(PREFIX_SCHEMA+strObjectName, doc);
+			if(!flagAdmin)
+				Util.insert(PREFIX_SCHEMA+strObjectName, doc);
+			else
+				Util.insert(PREFIX_ID+strObjectName, doc);
 		}
 		else
 			throw new Exception("Error... Object Data is already added for same Object Type, Data Name and Version.");
@@ -32,15 +39,27 @@ public class ObjectData extends Constants{
 	
 	public static void delete(String strObjectName, String strDataName, String strVersion) throws Exception
 	{
+		delete(strObjectName, strDataName, strVersion, false);
+	}
+	
+	public static void delete(String strObjectName, String strDataName, String strVersion, boolean flagAdmin) throws Exception
+	{
 		Document docCheck = getDocument(strObjectName, strDataName, strVersion);
 		
 		if(docCheck!=null)
 		{
 			Util.delete(docCheck.getObjectId(ID).toString(), COLLECTION_ID_OBJECTBASICDATA);
-			Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMA+strObjectName);
-			Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMAREV+strObjectName);
-			Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMAREVOBJ+strObjectName);
-			Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_HIST_SCHEMA+strObjectName);
+			if(!flagAdmin)
+			{
+				Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMA+strObjectName);
+				Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMAREV+strObjectName);
+				Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMAREVOBJ+strObjectName);
+				Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_HIST_SCHEMA+strObjectName);
+			}
+			else
+			{
+				Util.delete(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_ID+strObjectName);
+			}
 		}
 		else
 			throw new Exception("Error... Object Data is not available for given Object Type, Data Name and Version.");
@@ -48,11 +67,19 @@ public class ObjectData extends Constants{
 	
 	public static void update(String strObjectName, String strDataName, String strVersion, Document doc) throws Exception
 	{
+		update(strObjectName, strDataName, strVersion, doc, false);
+	}
+	
+	public static void update(String strObjectName, String strDataName, String strVersion, Document doc, boolean flagAdmin) throws Exception
+	{
 		Document docCheck = getDocument(strObjectName, strDataName, strVersion);
 		
 		if(docCheck!=null)
 		{
-			Util.update(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID,PREFIX_SCHEMA+strObjectName, doc);
+			if(!flagAdmin)
+				Util.update(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_SCHEMA+strObjectName, doc);
+			else
+				Util.update(docCheck.getObjectId(ID).toString(), FIELD_OBJECTID, PREFIX_ID+strObjectName, doc);
 		}
 		else
 			throw new Exception("Error... Object Data is not available for given Object Type, Data Name and Version.");
@@ -60,12 +87,20 @@ public class ObjectData extends Constants{
 	
 	public static Document getData(String strObjectName, String strDataName, String strVersion) throws Exception
 	{
-		
+		return getData(strObjectName, strDataName, strVersion, false);
+	}
+	
+	public static Document getData(String strObjectName, String strDataName, String strVersion, boolean flagAdmin) throws Exception
+	{
 		Document docCheck = getDocument(strObjectName, strDataName, strVersion);
 		
 		BasicDBObject findData = new BasicDBObject();
 		findData.put(FIELD_OBJECTID, docCheck.getObjectId(ID));
-		Document docData=Util.find(PREFIX_SCHEMA+strObjectName, findData);
+		Document docData=null;
+		if(!flagAdmin)
+			docData = Util.find(PREFIX_SCHEMA+strObjectName, findData);
+		else
+			docData = Util.find(PREFIX_ID+strObjectName, findData);
 		docCheck.putAll(docData);
 		return docCheck;
 	}
@@ -82,6 +117,7 @@ public class ObjectData extends Constants{
 	public static Document getDocument(String strObjectName, String strDataName, String strVersion) throws Exception
 	{
 		Object objectId = ObjectType.getId(strObjectName);
+		
 		if(objectId!=null)
 		{
 		BasicDBObject find = new BasicDBObject();

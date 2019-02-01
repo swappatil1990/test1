@@ -6,6 +6,7 @@ public class Constants {
 	public static String INC = "$inc";
 	public static String DIRECTION_FROM = "From";
 	public static String DIRECTION_TO = "To";
+	public static String PREFIX_ID = "id_";
 	public static String PREFIX_SCHEMA = "schema_";
 	public static String PREFIX_SCHEMAREV= "schemaRev_";
 	public static String PREFIX_SCHEMAREVOBJ = "schemaRevObj_";
@@ -19,7 +20,11 @@ public class Constants {
 	public static String COLLECTION_ID_RELATIONS = "id_Relations";
 	public static String COLLECTION_ID_RELATIONELEMENTS = "id_RelationElements";
 	public static String COLLECTION_ID_OBJECTBASICDATA = "id_ObjectBasicData";
+	public static String COLLECTION_ID_USER = "id_User";
 	
+	public static String FIELD_ADMINSCHEMAACCESS = "adminSchemaAccess";
+	public static String FIELD_SUPERUIACCESS = "superUIAccess";
+	public static String FEILD_DESIGNATION = "designation";
 	public static String FIELD_CURRENTAUTONUMBER = "currentAutoNumber";
 	public static String FIELD_ELEMENTNAME = "elementName";
 	public static String FIELD_DATATYPE = "dataType";
@@ -35,6 +40,8 @@ public class Constants {
 	public static String FIELD_SUFFIX = "suffix";
 	public static String FIELD_NUMBERLENGTH = "numberLength";
 	public static String FIELD_STATEFLOW = "stateflow";
+	
+	public static String FIELD_PASSWORD = "password";
 	
 	public static String FIELD_RELATIONNAME = "relationName";
 	public static String FIELD_RELATIONTYPE= "relationType";
