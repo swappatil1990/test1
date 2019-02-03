@@ -1,3 +1,9 @@
+<%@page import="idream2.main.core.ObjectData"%>
+<%@page import="idream2.main.core.Util"%>
+<%@page import="com.mongodb.BasicDBObject"%>
+<%@page import="org.bson.Document"%>
+<%@page import="com.mongodb.client.FindIterable"%>
+
 <aside id="sidebar-left" class="sidebar-left">
 				
 	<div class="sidebar-header">
@@ -13,43 +19,23 @@
 		<div class="nano-content">
 			<nav id="menu" class="nav-main" role="navigation">
 				<ul class="nav nav-main">
+					<%
+					BasicDBObject findMenu=new BasicDBObject();
+					
+					FindIterable<Document> docsMenuList = Util.findMany("id_Menu", findMenu);
+					
+					for(Document docMenu:docsMenuList)
+					{	
+					%>
 					<li class="nav-active">
-						<a href="home.jsp">
-							<i class="fa fa-home" aria-hidden="true"></i>
-							<span>Dashboard</span>
+						<a href="<%= docMenu.get("url").toString() %>">
+							<i class="<%=  docMenu.get("icon").toString() %>" aria-hidden="true"></i>
+							<span><%= docMenu.get("displayName").toString() %></span>
 						</a>
 					</li>
-					<li class="nav-parent">
-						<a>
-							<i class="fa fa-list-alt" aria-hidden="true"></i>
-							<span>Forms</span>
-						</a>
-						<ul class="nav nav-children">
-							<li>
-								<a href="form.jsp">
-									 Basic
-								</a>
-							</li>
-							<li>
-								<a href="commandPage.jsp">
-									 CommandBox
-								</a>
-							</li>
-						</ul>
-					</li>
-					<li class="nav-parent">
-						<a>
-							<i class="fa fa-list-alt" aria-hidden="true"></i>
-							<span>Table</span>
-						</a>
-						<ul class="nav nav-children">
-							<li>
-								<a href="table.jsp">
-									 Basic
-								</a>
-							</li>
-						</ul>
-					</li>
+					<%
+					}
+					%>
 				</ul>
 			</nav>
 		</div>

@@ -117,7 +117,6 @@ public class ObjectData extends Constants{
 	public static Document getDocument(String strObjectName, String strDataName, String strVersion) throws Exception
 	{
 		Object objectId = ObjectType.getId(strObjectName);
-		
 		if(objectId!=null)
 		{
 		BasicDBObject find = new BasicDBObject();

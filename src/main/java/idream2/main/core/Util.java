@@ -1,5 +1,8 @@
 package idream2.main.core;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -10,6 +13,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.result.UpdateResult;
 
 public class Util extends Constants{
 	static MongoDatabase database=null;
@@ -25,13 +29,23 @@ public class Util extends Constants{
 		}
 	}
 	
-	public static void insert(String strTable, Document doc) throws Exception
+	public static String insert(String strTable, Document doc) throws Exception
 	{
 		checkLogin();
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		
 		collection.insertOne(doc);
+		
+		BasicDBObject find = new BasicDBObject();
+		for ( String key : doc.keySet() ) {
+			find.put(key, doc.get(key));
+		}
+		
+		Document docResult = find(strTable, find);
+		System.out.println("docResult.getObjectId(\"_id\"): "+docResult.getObjectId("_id"));
+		
+		return docResult.getObjectId("_id").toString();
 	}
 	
 	public static void delete(String strDataId, String strTable) throws Exception
@@ -53,12 +67,15 @@ public class Util extends Constants{
 		collection.deleteOne(find);
 	}
 	
-	public static void update(String strDataId, String strTable, Document mData) throws Exception
+	public static String update(String strDataId, String strTable, Document mData) throws Exception
 	{
+		
 		checkLogin();
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
-		collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document(SET, mData));
+		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document(SET, mData));
+		
+		return resultDoc.getModifiedCount()+"";
 	}
 	
 	public static void update(String strDataId, String strElementName, String strTable, Document mData) throws Exception
@@ -170,5 +187,13 @@ public class Util extends Constants{
 			return Context.contextId;
 		else
 			throw new Exception("Error... Login context not found.");
+	}
+	
+	public static Object callMethod(String className, String methodName, Map<String, Object> arg) throws Exception
+	{
+		Class classRef = Class.forName("idream2.main.UI."+className);
+		Method instanceMethod = classRef.getMethod(methodName, Map.class);
+		
+		return (Object) instanceMethod.invoke(classRef, arg);
 	}
 }

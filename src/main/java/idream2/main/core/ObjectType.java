@@ -52,12 +52,12 @@ public class ObjectType extends Constants{
 			throw new Exception("Error... Element "+strElementName+" is not found in "+strObjectName+".");
 	}
 	
-	public static void create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength) throws Exception
+	public static String create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength) throws Exception
 	{
-		create(strName, strType, strDescription, strPrefix, currentAutoNum, strSuffix, numLength, false);
+		return create(strName, strType, strDescription, strPrefix, currentAutoNum, strSuffix, numLength, false);
 	}
 	
-	public static void create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength, boolean flagAdmin) throws Exception
+	public static String create(String strName, String strType, String strDescription, String strPrefix, int currentAutoNum, String strSuffix, int numLength, boolean flagAdmin) throws Exception
 	{
 		BasicDBObject find = new BasicDBObject();
 	    find.put(FIELD_OBJECTNAME, strName);
@@ -76,7 +76,7 @@ public class ObjectType extends Constants{
 			doc.put(FIELD_NUMBERLENGTH, numLength);
 			doc.put(FIELD_STATEFLOW, "");
 			doc.put(FIELD_STATUS, VALUE_ACTIVE);
-			Util.insert(COLLECTION_ID_OBJECTS, doc);
+			String strObjectId = Util.insert(COLLECTION_ID_OBJECTS, doc);
 			if(!flagAdmin)
 			{
 				Util.createCollection(PREFIX_SCHEMA+strName);
@@ -88,6 +88,7 @@ public class ObjectType extends Constants{
 			{
 				Util.createCollection(PREFIX_ID+strName);
 			}
+			return strObjectId;
 		}
 		else
 			throw new Exception("Error... Object "+strName+" is already exist.");

@@ -2,6 +2,8 @@ package idream2.main.core;
 
 import org.bson.Document;
 
+import com.mongodb.BasicDBObject;
+
 public class Context extends Constants{
 	public static String strUser="";
 	String strPassword="";
@@ -14,7 +16,10 @@ public class Context extends Constants{
 	{
 		try {
 			flagLogin=false;
-			Document doc = ObjectData.getData("User", strUser, "-", true);
+			
+			BasicDBObject findCondition=new BasicDBObject();
+			findCondition.append(FIELD_NAME, strUser);
+			Document doc = Util.find("id_User", findCondition);
 			if(doc.get(FIELD_PASSWORD).toString().equals(strPassword))
 			{
 				contextId=doc.getObjectId(ID).toString();

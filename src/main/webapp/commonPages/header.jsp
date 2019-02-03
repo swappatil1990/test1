@@ -51,6 +51,9 @@ if(!Context.checkContext(strContextId))
 						<a role="menuitem" tabindex="-1" href="pages-user-profile.html"><i class="fa fa-user"></i> My Profile</a>
 					</li>
 					<li>
+						<a role="menuitem" tabindex="-1" href="commonPages/loginOption/optionPage.jsp"><i class="fa fa-th-large"></i> Change Portal View</a>
+					</li>
+					<li>
 						<a role="menuitem" tabindex="-1" href="logout.jsp"><i class="fa fa-power-off"></i> Logout</a>
 					</li>
 				</ul>

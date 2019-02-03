@@ -1,9 +1,16 @@
-
+function httpGet(theUrl)
+{
+	
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+	xmlHttp.send( null );
+	return xmlHttp.responseText;
+}
 
 (function( $ ) {
 
 	'use strict';
-
+	var objectId ="";
 	var EditableTable = {
 
 		options: {
@@ -37,13 +44,9 @@
 		},
 
 		build: function() {
+			nullColumn[nullColumn.length]={ "bSortable": false };
 			this.datatable = this.$table.DataTable({
-				aoColumns: [
-					null,
-					null,
-					null,
-					{ "bSortable": false }
-				]
+				aoColumns: nullColumn
 			});
 
 			window.dt = this.datatable;
@@ -57,8 +60,37 @@
 			this.$table
 				.on('click', 'a.save-row', function( e ) {
 					e.preventDefault();
-
-					_self.rowSave( $(this).closest( 'tr' ) );
+					
+					var columnData = "";
+					var rowData = $(this).closest( 'tr' ).find('td');
+					var i=0;
+					debugger;
+					for(i=0; i<rowData.length;i++)
+					{
+						if(columnData+rowData[i].childNodes[0]=="undefined")
+						{
+							columnData=columnData+",";
+						}
+						else if(columnData+rowData[i].childNodes[0].value=="undefined")
+						{
+							columnData=columnData+rowData[i].childNodes[0].data+",";
+						}
+						else
+						{
+							columnData=columnData+rowData[i].childNodes[0].value+",";
+						}
+					};
+					var strUrl = document.location.href.split("table.jsp")[0]+"API/saveTableRow.jsp?columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
+					var result = httpGet(encodeURI(strUrl));
+					objectId = result.replace("true", "");
+					if(result.indexOf("true")!=-1)
+					{
+						_self.rowSave( $(this).closest( 'tr' ) );
+					}
+					else
+					{
+						_self.rowCancel( $(this).closest( 'tr' ) );
+					}
 				})
 				.on('click', 'a.cancel-row', function( e ) {
 					e.preventDefault();
@@ -86,7 +118,11 @@
 							change: function() {
 								_self.dialog.$confirm.on( 'click', function( e ) {
 									e.preventDefault();
-
+									debugger;
+									var objectDataId=$row[0].cells[0].childNodes[0].data;
+									var strUrl = document.location.href.split("table.jsp")[0]+"API/deleteTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType;
+									var result = httpGet(encodeURI(strUrl));
+									
 									_self.rowRemove( $row );
 									$.magnificPopup.close();
 								});
@@ -117,7 +153,6 @@
 		// ==========================================================================================
 		rowAdd: function() {
 			this.$addButton.attr({ 'disabled': 'disabled' });
-
 			var actions,
 				data,
 				$row;
@@ -128,10 +163,20 @@
 				'<a href="#" class="on-default edit-row"><i class="fa fa-pencil"></i></a>',
 				'<a href="#" class="on-default remove-row"><i class="fa fa-trash-o"></i></a>'
 			].join(' ');
-
-			data = this.datatable.row.add([ '', '', '', actions ]);
+			
+			var cnt=0;
+			var emptyColumns=[];
+			for(cnt=0;cnt<blankColumn.length;cnt++)
+				emptyColumns[cnt]='';
+			
+			emptyColumns[blankColumn.length]=actions;
+			data = this.datatable.row.add(emptyColumns);
 			$row = this.datatable.row( data[0] ).nodes().to$();
-
+			
+			for(cnt=0;cnt<blankColumn.length;cnt++)
+				$row[0].cells[cnt].className=blankColumn[cnt];
+			
+			
 			$row
 				.addClass( 'adding' )
 				.find( 'td:last' )
@@ -159,7 +204,7 @@
 				if ( $actions.get(0) ) {
 					this.rowSetActionsDefault( $row );
 				}
-
+				
 				this.datatable.draw();
 			}
 		},
@@ -167,13 +212,13 @@
 		rowEdit: function( $row ) {
 			var _self = this,
 				data;
-
+			
 			data = this.datatable.row( $row.get(0) ).data();
 
 			$row.children( 'td' ).each(function( i ) {
 				var $this = $( this );
 
-				if ( $this.hasClass('actions') ) {
+				if ( $this.hasClass('actions') || $this.hasClass('noEdit')) {
 					_self.rowSetActionsEditing( $row );
 				} else {
 					$this.html( '<input type="text" class="form-control input-block" value="' + data[i] + '"/>' );
@@ -182,6 +227,9 @@
 		},
 
 		rowSave: function( $row ) {
+			debugger;
+			var objectIdNode = document.createTextNode(objectId);    
+			//$row[0].cell[0].innerHTML = objectId;
 			var _self     = this,
 				$actions,
 				values    = [];
@@ -204,6 +252,7 @@
 
 			this.datatable.row( $row.get(0) ).data( values );
 
+			$row[0].cells[0].appendChild(objectIdNode);
 			$actions = $row.find('td.actions');
 			if ( $actions.get(0) ) {
 				this.rowSetActionsDefault( $row );
