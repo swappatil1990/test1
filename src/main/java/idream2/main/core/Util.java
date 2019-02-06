@@ -1,12 +1,14 @@
 package idream2.main.core;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.ClientSession;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -18,6 +20,7 @@ import com.mongodb.client.result.UpdateResult;
 public class Util extends Constants{
 	static MongoDatabase database=null;
 	static MongoClient mongoClient =null;
+	static ClientSession s;
 	public static void connectedDB()
 	{
 		if(database==null)
@@ -27,14 +30,19 @@ public class Util extends Constants{
 			mongoClient = MongoClients.create("mongodb+srv://swap:wws2RZ1bJia6KYS4@cluster0-ko8ql.mongodb.net/test?retryWrites=true");
 			database = mongoClient.getDatabase("mydb");
 		}
+		//s= mongoClient.startSession();
+		//s.startTransaction();
+		//s.commitTransaction();
 	}
 	
 	public static String insert(String strTable, Document doc) throws Exception
 	{
 		checkLogin();
 		connectedDB();
+		
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		
+		executeEvent(strTable, "Insert", "Before", doc, "");
 		collection.insertOne(doc);
 		
 		BasicDBObject find = new BasicDBObject();
@@ -43,9 +51,11 @@ public class Util extends Constants{
 		}
 		
 		Document docResult = find(strTable, find);
-		System.out.println("docResult.getObjectId(\"_id\"): "+docResult.getObjectId("_id"));
+		String strObjectDataId = docResult.getObjectId("_id").toString();
 		
-		return docResult.getObjectId("_id").toString();
+		executeEvent(strTable, "Insert", "After", doc, strObjectDataId);
+		
+		return strObjectDataId;
 	}
 	
 	public static void delete(String strDataId, String strTable) throws Exception
@@ -53,8 +63,13 @@ public class Util extends Constants{
 		checkLogin();
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
+		Document doc=new Document();
+		doc.append("objectName", strTable.replace("id_", "").replace("schema_", ""));
+		executeEvent(strTable, "Delete", "Before", doc, strDataId);
 		
 		collection.deleteOne(new Document(ID, new ObjectId(strDataId)));
+		
+		executeEvent(strTable, "Delete", "After", doc, strDataId);
 	}
 	
 	public static void delete(String strDataId, String strElementName, String strTable) throws Exception
@@ -64,6 +79,7 @@ public class Util extends Constants{
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		BasicDBObject find = new BasicDBObject();
 	    find.put(strElementName, new ObjectId(strDataId));
+	    
 		collection.deleteOne(find);
 	}
 	
@@ -73,7 +89,12 @@ public class Util extends Constants{
 		checkLogin();
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		executeEvent(strTable, "Update", "Before", mData, strDataId);
+		
 		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document(SET, mData));
+		
+		executeEvent(strTable, "Update", "After", mData, strDataId);
 		
 		return resultDoc.getModifiedCount()+"";
 	}
@@ -195,5 +216,37 @@ public class Util extends Constants{
 		Method instanceMethod = classRef.getMethod(methodName, Map.class);
 		
 		return (Object) instanceMethod.invoke(classRef, arg);
+	}
+	
+	public static void executeEvent(String strTableName, String strEventOn, String strEventAction, Document doc, String strObjectDataId) throws Exception
+	{
+		Map<String,Object> argMap=new HashMap<String,Object>();
+		argMap.put("Document", doc);
+		argMap.put("ObjectId", strObjectDataId);
+		/*
+		 * String strObjectId=""; try { strObjectId =
+		 * ObjectType.getId(strTableName.replaceAll("id_", "").replaceAll("schema_",
+		 * "")).toString(); } catch (Exception e) { // TODO: handle exception }
+		 */
+		Events.runObjectEvent(strTableName, strEventOn, strEventAction, argMap);
+	}
+	
+	public static boolean checkEmpty(String str)
+	{
+		
+		if(str==null || str.equals("") || str.equals("null"))
+			return true;
+		else
+			return false;
+	}
+	
+	public static String getTableURL(String strTableName) throws Exception
+	{
+		System.out.println("strTableName : "+strTableName);
+		BasicDBObject findCondition=new BasicDBObject();
+		findCondition.append("name", strTableName);
+		Document doc = find("id_Tables", findCondition);
+		System.out.println("doc : "+doc );
+		return "../table.jsp?tableName="+strTableName+"&objectType="+doc.getString("objectType")+"&adminTable="+doc.getString("adminTable")+"&tableDataMethod="+doc.getString("tableDataMethod")+"&displayName="+doc.getString("displayName");
 	}
 }

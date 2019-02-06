@@ -9,6 +9,6 @@ out.clear();
 
 String strObjectId = request.getParameter("objectDataId");
 String strObjectTypeName = request.getParameter("objectTypeName");
-Util.delete(strObjectId, "_id", strObjectTypeName);
+Util.delete(strObjectId, strObjectTypeName);
 out.print("true");
 %>

@@ -108,19 +108,21 @@
 										%>
 										<tr class="gradeX">
 											<%
+											String strDataId=docdata.getObjectId("_id").toString();
+											String strNestedUrl=docTableProperties.getString("nestedURL").replace("parentDataId=", "parentDataId="+strDataId);
 											for(String strColumnName: arrColumnNames)
 											{
 												if(strColumnName.equals("_id"))
 												{
 												%>
-													<td class="noEdit"><%=  docdata.get(strColumnName)%></td>
+													<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><a href="<%=strNestedUrl%>"><%=  docdata.get(strColumnName)%></a></td>
 												<%
 												}
 												else
 												{
-												%>
-													<td><%=  docdata.get(strColumnName)%></td>
-												<%
+													%>
+													<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
+													<%
 												}
 											} 
 											%>
@@ -197,6 +199,7 @@
 		var blankColumn = [<%=JSColumnClass%>];
 		var tableColumns = '<%=JSColumnNames%>';
 		var objectType = "<%=strObjectType%>";
+		var parentDataId = "<%=strParentDataId%>";
 		</script>
 		<script src="assets/javascripts/tables/examples.datatables.editable.js"></script>
 		

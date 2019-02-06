@@ -67,11 +67,15 @@ function httpGet(theUrl)
 					debugger;
 					for(i=0; i<rowData.length;i++)
 					{
-						if(columnData+rowData[i].childNodes[0]=="undefined")
+						if(rowData[i].childNodes.length!=0 && rowData[i].childNodes[0].nodeName=="A")
+						{
+							columnData=columnData+rowData[i].childNodes[0].innerHTML+",";
+						}
+						else if(rowData[i].childNodes[0]==undefined)
 						{
 							columnData=columnData+",";
 						}
-						else if(columnData+rowData[i].childNodes[0].value=="undefined")
+						else if(rowData[i].childNodes[0].value==undefined)
 						{
 							columnData=columnData+rowData[i].childNodes[0].data+",";
 						}
@@ -80,7 +84,7 @@ function httpGet(theUrl)
 							columnData=columnData+rowData[i].childNodes[0].value+",";
 						}
 					};
-					var strUrl = document.location.href.split("table.jsp")[0]+"API/saveTableRow.jsp?columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
+					var strUrl = document.location.href.split("table.jsp")[0]+"API/saveTableRow.jsp?parentDataId="+parentDataId+"&columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
 					var result = httpGet(encodeURI(strUrl));
 					objectId = result.replace("true", "");
 					if(result.indexOf("true")!=-1)
@@ -119,7 +123,12 @@ function httpGet(theUrl)
 								_self.dialog.$confirm.on( 'click', function( e ) {
 									e.preventDefault();
 									debugger;
-									var objectDataId=$row[0].cells[0].childNodes[0].data;
+									var objectDataId="";
+									if($row[0].cells[0].childNodes[0].nodeName=="A")
+										objectDataId=$row[0].cells[0].childNodes[0].innerHTML;
+									else
+										objectDataId=$row[0].cells[0].childNodes[0].data;
+									
 									var strUrl = document.location.href.split("table.jsp")[0]+"API/deleteTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType;
 									var result = httpGet(encodeURI(strUrl));
 									
@@ -220,7 +229,11 @@ function httpGet(theUrl)
 
 				if ( $this.hasClass('actions') || $this.hasClass('noEdit')) {
 					_self.rowSetActionsEditing( $row );
-				} else {
+				}
+				else if ($this.hasClass('passwordField')) {
+					$this.html( '<input type="password" class="form-control input-block" value="' + data[i] + '"/>' );
+				}
+				else {
 					$this.html( '<input type="text" class="form-control input-block" value="' + data[i] + '"/>' );
 				}
 			});

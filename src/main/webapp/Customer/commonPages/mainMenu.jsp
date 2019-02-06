@@ -22,7 +22,7 @@
 					<%
 					BasicDBObject findMenu=new BasicDBObject();
 					findMenu.append("mainMenu", "true");
-					FindIterable<Document> docsMenuList = Util.findMany("id_Menu", findMenu);
+					FindIterable<Document> docsMenuList = Util.findMany("id_CMPMenu", findMenu);
 					String strSelectedMenu = request.getParameter("selectedMenu");
 					for(Document docMenu:docsMenuList)
 					{	
@@ -36,7 +36,7 @@
 						}
 						else
 						{
-							strURL =  "href='"+docMenu.get("url").toString()+"&selectedMenu="+docMenu.getObjectId("_id")+"'";
+							strURL =  "href='"+Util.getTableURL(docMenu.get("table").toString())+"&selectedMenu="+docMenu.getObjectId("_id")+"'";
 						}
 						if(!Util.checkEmpty(strSelectedMenu) && strSelectedMenu.contains(docMenu.getObjectId("_id").toString()))
 						{
@@ -51,7 +51,7 @@
 						<%
 						BasicDBObject findMenuChild=new BasicDBObject();
 						findMenuChild.append("objectId", docMenu.getObjectId("_id"));
-						FindIterable<Document> docsMenuListChild = Util.findMany("id_Menu", findMenuChild);
+						FindIterable<Document> docsMenuListChild = Util.findMany("id_CMPMenu", findMenuChild);
 						for(Document docMenuChild:docsMenuListChild)
 						{
 							String strClassChild = "";
@@ -62,7 +62,7 @@
 						%>
 						<ul class="nav nav-children">
 							<li class="<%=strClassChild%>">
-								<a href="<%=docMenuChild.get("url").toString()%>&selectedMenu=<%=docMenu.getObjectId("_id")+":"+docMenuChild.getObjectId("_id")%>">
+								<a href="<%=Util.getTableURL(docMenuChild.get("table").toString())%>&selectedMenu=<%=docMenu.getObjectId("_id")+":"+docMenuChild.getObjectId("_id")%>">
 									<i class="<%=  docMenuChild.get("icon").toString() %>"></i>
 									<span><%= docMenuChild.get("displayName").toString() %></span>
 								</a>

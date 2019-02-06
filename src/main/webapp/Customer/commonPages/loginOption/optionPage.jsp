@@ -119,7 +119,7 @@
 		    <form class="login-form" action="../../home.jsp" method="post" >
 		      <button type="submit">Administrator Portal</button>
 		      </form>
-		       <form class="login-form" action="../../Customer/home.jsp" method="post">
+		       <form class="login-form" action="../../home.jsp" method="post">
 		      <button type="submit">Customer Portal</button>
 		    </form>
 		  </div>

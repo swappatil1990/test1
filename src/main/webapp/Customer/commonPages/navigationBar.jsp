@@ -1,5 +1,5 @@
 <header class="page-header">
-	<h2>Administrator Portal</h2>
+	<h2>Customer Portal</h2>
 
 	<div class="right-wrapper pull-right">
 		<ol class="breadcrumbs">
