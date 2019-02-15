@@ -26,15 +26,10 @@
 					String strSelectedMenu = request.getParameter("selectedMenu");
 					for(Document docMenu:docsMenuList)
 					{	
-						String strURL = docMenu.get("url").toString();
+						String strURL = "";//docMenu.get("table").toString();
 						String strClass = "";
 						
-						if(Util.checkEmpty(strURL))
-						{
-							strURL =  "";
-							strClass = "nav-parent";
-						}
-						else
+						
 						{
 							strURL =  "href='"+Util.getTableURL(docMenu.get("table").toString())+"&selectedMenu="+docMenu.getObjectId("_id")+"'";
 						}

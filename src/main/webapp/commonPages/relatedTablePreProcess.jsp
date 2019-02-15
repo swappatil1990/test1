@@ -8,6 +8,7 @@
 <%@ page import = "java.util.Map" %>
 <%@ page import = "java.util.HashMap" %>
 <%
+
 	/*Document docRequest = new Document();
 	Map<String, String[]> parameters = request.getParameterMap();
 	for(String parameter : parameters.keySet()) {
@@ -17,24 +18,34 @@
         	strValue =arrValue[0];
 	    docRequest.append(parameter, strValue);
 	}*/
-	Map<String, Object> ArgMap = new HashMap<String, Object>();
-	Map<String, String[]> parameters = request.getParameterMap();
-	for(String parameter : parameters.keySet()) {
-		ArgMap.put(parameter, (Object)parameters.get(parameter)[0]);
+	Map<String, Object> rArgMap = new HashMap<String, Object>();
+	Map<String, String[]> rParameters = request.getParameterMap();
+	for(String parameter : rParameters.keySet()) {
+		rArgMap.put(parameter, (Object)rParameters.get(parameter)[0]);
 	}
-	String strObjectType="";
-	String strAdminTable="";
-	String strAddMethod="";
-	String strParentDataId=request.getParameter("parentDataId");
-	String strTableName=request.getParameter("tableName");
-	
-	BasicDBObject findCondition=new BasicDBObject();
-	findCondition.append("name", strTableName);
-	Document docTable = Util.find("id_Tables", findCondition);
-	strObjectType=docTable.getString("objectType");
-	strAdminTable=docTable.getString("adminTable");
-	strAddMethod=docTable.getString("tableDataMethod");
-	
+	System.out.println("=========Start related table 2");
+	String strRObjectType="";
+	String strRAdminTable="";
+	String strRAddMethod="";
+	String strRParentDataId=request.getParameter("parentDataId");
+	String strRTableName=request.getParameter("tableName");
+	if(strRTableName==null)
+	{
+		strRObjectType="id_ObjectElements";
+		strRAdminTable="true";
+		strRAddMethod="tableData:getAdminObjectType";
+		strRTableName="common";
+	}
+	else
+	{
+		BasicDBObject findCondition=new BasicDBObject();
+		findCondition.append("name", strRTableName);
+		Document docTable = Util.find("id_Tables", findCondition);
+		strRObjectType=docTable.getString("objectType");
+		strRAdminTable=docTable.getString("adminTable");
+		strRAddMethod=docTable.getString("tableDataMethod");
+	}
+	System.out.println("=========Start related table 3");
 	String[] arrColumnNames = null;
 	String[] arrColumnDisplayNames = null;
 	String strTableTitle = null;
@@ -42,15 +53,15 @@
 	String JSColumnNames = "";
 	String JSColumnClass= "";
 	String JSColumnProperties = "";
-	ArrayList<Document> allDocs = null;
+	ArrayList<Document> allRDocs = null;
 	try
 	{
-		System.out.println("========="+strObjectType);
-		System.out.println("========="+strAdminTable);
-		System.out.println("========="+strAddMethod.split(":")[0]);
-		System.out.println("========="+strAddMethod.split(":")[1]);
+		System.out.println("========="+strRObjectType);
+		System.out.println("========="+strRAdminTable);
+		System.out.println("========="+strRAddMethod.split(":")[0]);
+		System.out.println("========="+strRAddMethod.split(":")[1]);
 		//allDocs  = tableData.getAdminObjectType(docRequest);
-		allDocs=(ArrayList<Document>)Util.callMethod(strAddMethod.split(":")[0], strAddMethod.split(":")[1], ArgMap);
+		allRDocs=(ArrayList<Document>)Util.callMethod(strRAddMethod.split(":")[0], strRAddMethod.split(":")[1], rArgMap);
 		System.out.println("=========DONE ");
 	}
 	catch(Exception e)
@@ -58,11 +69,11 @@
 		e.printStackTrace();
 	}
 	
-	Document docTableProperties = allDocs.get(0);
-	Document docColumnClass = allDocs.get(1);
-	Document docColumnProperties = allDocs.get(2);
-	Document docColumnDisplayName = allDocs.get(3);
-	Document docColumnNos = allDocs.get(4);
+	Document docTableProperties = allRDocs.get(0);
+	Document docColumnClass = allRDocs.get(1);
+	Document docColumnProperties = allRDocs.get(2);
+	Document docColumnDisplayName = allRDocs.get(3);
+	Document docColumnNos = allRDocs.get(4);
 	
 	arrColumnDisplayNames=new String[docColumnNos.keySet().size()];
 	arrColumnNames=new String[docColumnNos.keySet().size()];

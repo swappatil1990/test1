@@ -135,13 +135,11 @@
 	<body>
 		<div class="login-page">
 		  <div class="form">
-		    
-		    <form class="login-form" action="loginValidate.jsp" method="post" >
-		      <input type="text" placeholder="username" name="username"/>
-		      <input type="password" placeholder="password" name="password"/>
-		      <button type="submit">login</button>
-		      <p class="message"><a href="forgetPassword.jsp" onclick="">Forgot your password?</a></p>
-		      <p class="message">Not registered? <a href="signup.jsp">Create an account</a></p>
+		    <form class="login-form" action="commonPages/forgetPasswordPostProcess.jsp" method="post" >
+		    	<p>Enter your email address and we will send you instructions on how to create a new password.</p>
+		      <input type="text" placeholder="email" name="email"/>
+		      <button type="submit">Submit</button>
+		      <p class="message"><a href="index.jsp" onclick="">Go to Login Page.</a></p>
 		    </form>
 		  </div>
 		</div>

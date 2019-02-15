@@ -44,12 +44,6 @@ public class tableColumnConstants {
 		adminTable.put("id_ObjectEvents_Prop", "{'bSortable': false },null,null,null,null,null,null");
 		adminTable.put("id_ObjectEvents_Class", "'noEdit','','','','','',''");
 		
-		adminTable.put("id_ObjectElements", "_id,name,displayName,inputType,dataType,maxSize,status");
-		adminTable.put("id_ObjectElements_Display", "Id,Element Name,Display Name,Input Type,Data Type,Max Size,Status");
-		adminTableTitle.put("id_ObjectElements", "Object Element List");
-		adminTable.put("id_ObjectElements_Nos", "1,2,3,4,5,6,7");
-		adminTable.put("id_ObjectElements_Prop", "{'bSortable': false },null,null,null,null,null,null");
-		adminTable.put("id_ObjectElements_Class", "'noEdit','','','','','',''");
 		
 		adminTable.put("id_CMPMenu", "_id,name,displayName,table,icon,objectId,mainMenu,status");
 		adminTable.put("id_CMPMenu_Display", "Id,Menu Name,Display Name,Table,Icon,Object Id,mainMenu,Status");
@@ -72,8 +66,8 @@ public class tableColumnConstants {
 		adminTable.put("id_Columns_Prop", "{'bSortable': false },null,null,null,null,null,null");
 		adminTable.put("id_Columns_Class", "'noEdit','','','','','',''");
 		
-		adminTable.put("id_Menu", "_id,name,displayName,table,icon,objectId,mainMenu,status");
-		adminTable.put("id_Menu_Display", "Id,Menu Name,Display Name,Table,Icon,Object Id,mainMenu,Status");
+		adminTable.put("id_Menu", "_id,name,displayName,url,icon,objectId,mainMenu,status");
+		adminTable.put("id_Menu_Display", "Id,Menu Name,Display Name,URL,Icon,Object Id,mainMenu,Status");
 		adminTableTitle.put("id_Menu", "Admin Menu List");
 		adminTable.put("id_Menu_Nos", "1,2,3,4,5,6,7,8");
 		adminTable.put("id_Menu_Prop", "{'bSortable': false },null,null,null,null,null,null,null");
@@ -92,5 +86,12 @@ public class tableColumnConstants {
 		adminTable.put("schema_Manager_Nos", "1,2,3,4,5,6,7,8");
 		adminTable.put("schema_Manager_Prop", "{'bSortable': false },null,null,null,null,null,null,null");
 		adminTable.put("schema_Manager_Class", "'noEdit','','','','','','',''");
+		
+		adminTable.put("common", "_id,name,displayName,status");
+		adminTable.put("common_Display", "Id,Name,Display Name,Status");
+		adminTableTitle.put("common", "");
+		adminTable.put("common_Nos", "1,2,3,4");
+		adminTable.put("common_Prop", "{'bSortable': false },null,null,null");
+		adminTable.put("common_Class", "'noEdit','','',''");
 	}
 }

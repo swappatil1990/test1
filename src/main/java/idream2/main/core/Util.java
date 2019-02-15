@@ -249,4 +249,14 @@ public class Util extends Constants{
 		System.out.println("doc : "+doc );
 		return "../table.jsp?tableName="+strTableName+"&objectType="+doc.getString("objectType")+"&adminTable="+doc.getString("adminTable")+"&tableDataMethod="+doc.getString("tableDataMethod")+"&displayName="+doc.getString("displayName");
 	}
+	
+	public static String getAdminTableURL(String strTableName) throws Exception
+	{
+		System.out.println("strTableName : "+strTableName);
+		BasicDBObject findCondition=new BasicDBObject();
+		findCondition.append("name", strTableName);
+		Document doc = find("id_Tables", findCondition);
+		System.out.println("doc : "+doc );
+		return "/table.jsp?tableName="+strTableName+"&objectType="+doc.getString("objectType")+"&adminTable="+doc.getString("adminTable")+"&tableDataMethod="+doc.getString("tableDataMethod")+"&displayName="+doc.getString("displayName");
+	}
 }
