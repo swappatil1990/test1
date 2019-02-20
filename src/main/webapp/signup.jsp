@@ -45,7 +45,7 @@
 						<h2 class="title text-uppercase text-bold m-none"><i class="fa fa-user mr-xs"></i> Sign Up</h2>
 					</div>
 					<div class="panel-body">
-						<form id="form" action="commonPages/signupPostProcess.jsp" method="post" class="form-horizontal">
+						<form id="form" action="commonPages/signupPostProcess.jsp" method="post" class="form-horizontal" onsubmit="return submitForm(event)">
 							<div class="form-group mb-lg">
 								<label>User Name</label>
 								<input name="username" type="text" class="form-control input-lg" required/>
@@ -60,11 +60,11 @@
 								<div class="row">
 									<div class="col-sm-6 mb-lg">
 										<label>Password</label>
-										<input name="pwd" type="password" class="form-control input-lg" required/>
+										<input name="pwd" type="password" class="form-control input-lg" onfocusout="storePassword(this)" required/>
 									</div>
 									<div class="col-sm-6 mb-lg">
 										<label>Password Confirmation</label>
-										<input name="pwd_confirm" type="password" class="form-control input-lg" required/>
+										<input name="pwd_confirm" type="password" class="form-control input-lg" onfocusout="checkPassword(this)" required/>
 									</div>
 								</div>
 							</div>
@@ -102,7 +102,7 @@
 									</div>
 								</div>
 								<div class="col-sm-4 text-right">
-									<button type="submit" class="btn btn-primary hidden-xs">Sign Up</button>
+									<button type="submit" class="btn btn-primary hidden-xs" >Sign Up</button>
 									<button type="submit" class="btn btn-primary btn-block btn-lg visible-xs mt-lg">Sign Up</button>
 								</div>
 							</div>
@@ -142,15 +142,51 @@
 		<!-- Examples -->
 		<script src="assets/javascripts/forms/examples.validation.js"></script>
 		<script type="text/javascript">
-		$(document).ready(function() {
-			jQuery(function($){
-			      var input = $('[type=tel]')
-			      input.mobilePhoneNumber({allowPhoneWithoutPrefix: '+1'});
-			      input.bind('country.mobilePhoneNumber', function(e, country) {
-			        $('.country').text(country || '')
-			      })
-				 });
-			});
+		var oldPassword="";
+		var flagError=false;
+		function submitForm(e)
+		{
+			debugger;
+			return !flagError;
+		}
+		function checkPassword(rePassField)
+		{
+			debugger;
+			if(oldPassword!=rePassField.value)
+			{
+				var errorElement = document.createElement("label");
+				errorElement.innerHTML="Password don't match.";
+				errorElement.setAttribute("class", "error"); 
+
+				var parentNode = rePassField.parentNode;
+				if(!parentNode.className.includes("has-error"))
+				{
+					parentNode.className += " has-error";
+				
+					parentNode.appendChild(errorElement);
+					flagError=true;
+				}
+			}
+			else
+			{
+				var parentNode = rePassField.parentNode;
+				if(parentNode.className.includes("has-error"))
+				{
+					parentNode.className = parentNode.className.replace(" has-error", "");
+					var cnt=0;
+					for(cnt=0; cnt<parentNode.childNodes.length; cnt++)
+					{
+						if(parentNode.childNodes[cnt].nodeName=="LABEL" && parentNode.childNodes[cnt].className=="error")
+							parentNode.removeChild(parentNode.childNodes[cnt]);
+					}
+					flagError=false;
+				}
+			}
+		}
+		function storePassword(oldPassField)
+		{
+			oldPassword=oldPassField.value;
+		}
 		</script>
 	</body>
 </html>

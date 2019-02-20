@@ -116,10 +116,13 @@
 	<body>
 		<div class="login-page">
 		  <div class="form">
-		    <form class="login-form" action="../../home.jsp" method="post" >
-		      <button type="submit">Administrator Portal</button>
+		    <form class="login-form" action="loginOptionPreProcess.jsp?option=SuperAdmin" method="post" >
+		      <button type="submit">Super Administrator Portal</button>
 		      </form>
-		       <form class="login-form" action="../../Customer/home.jsp" method="post">
+		       <form class="login-form" action="loginOptionPreProcess.jsp?option=Admin" method="post">
+		      <button type="submit">Administrator Portal</button>
+		    </form>
+		    <form class="login-form" action="loginOptionPreProcess.jsp?option=Customer" method="post">
 		      <button type="submit">Customer Portal</button>
 		    </form>
 		  </div>

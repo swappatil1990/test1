@@ -28,7 +28,7 @@ public class Util extends Constants{
 			//mongodb://swap:wws2RZ1bJia6KYS4@mycluster-shard-00-00-ko8ql.mongodb.net:27017,mycluster-shard-00-01-ko8ql.mongodb.net:27017,mycluster-shard-00-02-ko8ql.mongodb.net:27017/test?ssl=true&replicaSet=MyCluster-shard-0&authSource=admin&retryWrites=true
 			//mongodb+srv://swap:wws2RZ1bJia6KYS4@cluster0-ko8ql.mongodb.net/test?retryWrites=true
 			mongoClient = MongoClients.create("mongodb+srv://swap:wws2RZ1bJia6KYS4@cluster0-ko8ql.mongodb.net/test?retryWrites=true");
-			database = mongoClient.getDatabase("mydb");
+			database = mongoClient.getDatabase("Project1");
 		}
 		//s= mongoClient.startSession();
 		//s.startTransaction();
@@ -97,6 +97,90 @@ public class Util extends Constants{
 		executeEvent(strTable, "Update", "After", mData, strDataId);
 		
 		return resultDoc.getModifiedCount()+"";
+	}
+	
+	public static String connectToObject(String strDataId, String strTable, Document mData) throws Exception
+	{
+		
+		checkLogin();
+		connectedDB();
+		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		executeEvent(strTable, "Update", "Before", mData, strDataId);
+		
+		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document("$push", new BasicDBObject("connections", mData)));
+		
+		executeEvent(strTable, "Update", "After", mData, strDataId);
+		
+		return resultDoc.getModifiedCount()+"";
+	}
+	
+	public static String connectObjectToObject(String strParentDataId, String strDataId, String strTable) throws Exception
+	{
+		
+		checkLogin();
+		connectedDB();
+		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		executeEvent(strTable, "Update", "Before", null, strDataId);
+		
+		Document mData = new Document();
+		mData.append("objectId", strDataId);
+		
+		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strParentDataId)), new Document("$push", new BasicDBObject("connections", mData)));
+		
+		mData.append("objectId", strParentDataId);
+		
+		UpdateResult resultDoc2= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document("$push", new BasicDBObject("fromConnections", mData)));
+		
+		executeEvent(strTable, "Update", "After", null, strDataId);
+		
+		return resultDoc.getModifiedCount()+"";
+	}
+	
+	public static String deleteObjectToObject(String strDataId, String strTable, Document mData) throws Exception
+	{
+		
+		checkLogin();
+		connectedDB();
+		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		executeEvent(strTable, "Update", "Before", mData, strDataId);
+		
+		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document("$pull", new BasicDBObject("connections", mData)));
+		
+		executeEvent(strTable, "Update", "After", mData, strDataId);
+		
+		return resultDoc.getModifiedCount()+"";
+	}
+	
+	public static String deleteObjectFromObject(String strDataId, String strTable, Document mData) throws Exception
+	{
+		
+		checkLogin();
+		connectedDB();
+		MongoCollection<Document> collection = database.getCollection(strTable);
+		
+		executeEvent(strTable, "Update", "Before", mData, strDataId);
+		
+		UpdateResult resultDoc= collection.updateOne(new Document(ID, new ObjectId(strDataId)), new Document("$pull", new BasicDBObject("fromConnections", mData)));
+		
+		executeEvent(strTable, "Update", "After", mData, strDataId);
+		
+		return resultDoc.getModifiedCount()+"";
+	}
+	
+	public static String disconnectObjectObject(String strParentDataId, String strObjectId, String strTable) throws Exception
+	{
+		Document docSingle=new Document();
+		
+		docSingle.append("objectId", strObjectId);
+		Util.deleteObjectToObject(strParentDataId, strTable, docSingle);
+
+		docSingle.append("objectId", strParentDataId);
+		Util.deleteObjectFromObject(strObjectId, strTable, docSingle);
+		
+		return "true";
 	}
 	
 	public static void update(String strDataId, String strElementName, String strTable, Document mData) throws Exception
@@ -258,5 +342,20 @@ public class Util extends Constants{
 		Document doc = find("id_Tables", findCondition);
 		System.out.println("doc : "+doc );
 		return "/table.jsp?tableName="+strTableName+"&objectType="+doc.getString("objectType")+"&adminTable="+doc.getString("adminTable")+"&tableDataMethod="+doc.getString("tableDataMethod")+"&displayName="+doc.getString("displayName");
+	}
+	
+	public static void signUp(String strEmail, String strUserName, String strPassword, String strContactPerson, String strContactNo, String strBusinessName, String strNoOfOutlet) throws Exception
+	{
+		Context.contextId="temp";
+		Document doc=new Document();
+		doc.append("userName", strUserName);
+		doc.append("email", strEmail);
+		doc.append("password", strPassword);
+		doc.append("contactPerson", strContactPerson);
+		doc.append("contactNo", strContactNo);
+		doc.append("businessName", strBusinessName);
+		doc.append("noOfOutlets", strNoOfOutlet);
+		insert("id_signup", doc);
+		Context.contextId="";
 	}
 }

@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 
+import idream2.main.core.Context;
 import idream2.main.core.Util;
 
 public class formData {
@@ -19,7 +20,6 @@ public class formData {
 			System.out.println("========= Inside getFormData");
 			ArrayList<Document> formData=new ArrayList<Document>();
 			String strParentDataId = (String)docRequest.get("parentDataId");
-			String strFormName = (String)docRequest.get("formName");
 			String strObjectType = (String)docRequest.get("objectType");
 			
 			Document docFormPropertie=new Document();
@@ -27,17 +27,15 @@ public class formData {
 			formData.add(docFormPropertie);
 			
 			BasicDBObject findConditionColumns = new BasicDBObject();
-			findConditionColumns.append("objectId", new ObjectId(strParentDataId));
-			FindIterable<Document> docFields = Util.findMany("id_ObjectElements", findConditionColumns);
+			findConditionColumns.append("_Id", new ObjectId(strParentDataId));
+			FindIterable<Document> docFields = Util.findMany(Context.strCollectionName, findConditionColumns);
 			
 			BasicDBObject findCondition=new BasicDBObject();
 			findCondition.append("_id", new ObjectId(strParentDataId));
 			Document docData = Util.find(strObjectType, findCondition);
 			
 			for (Document doc : docFields) {
-				
 				String strData = (String) docData.get(doc.get("name"));
-				
 				doc.append("data", strData);
 				formData.add(doc);
 	        }

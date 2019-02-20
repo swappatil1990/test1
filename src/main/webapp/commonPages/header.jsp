@@ -1,9 +1,11 @@
 <%@page import="idream2.main.core.Context"%>
+<%@page import="idream2.main.core.Util"%>
 <%
 String strUserName=(String)session.getAttribute("sessionUserName");
 String strContextId=(String)session.getAttribute("sessionContaxtId");
-if(!Context.checkContext(strContextId))
+if(Util.checkEmpty(strContextId) || !Context.checkContext(strContextId))
 	response.sendRedirect("index.jsp");
+
 %>
 <header class="header">
 	<div class="logo-container">

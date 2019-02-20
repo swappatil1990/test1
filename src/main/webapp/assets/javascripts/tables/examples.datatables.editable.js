@@ -12,17 +12,24 @@ function httpGet(theUrl)
 	'use strict';
 	var objectId ="";
 	var EditableTable = {
-
+			 
 		options: {
 			addButton: '#addToTable',
+			addExistingButton: '#addExistingToTable',
 			table: '#datatable-editable',
 			dialog: {
 				wrapper: '#dialog',
 				cancelButton: '#dialogCancel',
 				confirmButton: '#dialogConfirm',
+			},
+			dialogRemove: {
+				wrapperRemove: '#dialogRemove',
+				cancelButtonRemove: '#dialogRemoveCancel',
+				confirmButtonRemove: '#dialogRemoveConfirm',
 			}
+	
 		},
-
+		
 		initialize: function() {
 			this
 				.setVars()
@@ -39,10 +46,22 @@ function httpGet(theUrl)
 			this.dialog.$wrapper	= $( this.options.dialog.wrapper );
 			this.dialog.$cancel		= $( this.options.dialog.cancelButton );
 			this.dialog.$confirm	= $( this.options.dialog.confirmButton );
+			
+			this.$addExistingButton			= $( this.options.addExistingButton );
+
+			// dialogRemove
+			this.dialogRemove				= {};
+			this.dialogRemove.$wrapperRemove	= $( this.options.dialogRemove.wrapperRemove );
+			this.dialogRemove.$cancelRemove		= $( this.options.dialogRemove.cancelButtonRemove );
+			this.dialogRemove.$confirmRemove	= $( this.options.dialogRemove.confirmButtonRemove );
 
 			return this;
 		},
-
+		
+		showDialog: function() {
+			
+		},
+		
 		build: function() {
 			nullColumn[nullColumn.length]={ "bSortable": false };
 			this.datatable = this.$table.DataTable({
@@ -84,7 +103,17 @@ function httpGet(theUrl)
 							columnData=columnData+rowData[i].childNodes[0].value+",";
 						}
 					};
-					var strUrl = document.location.href.split("table.jsp")[0]+"API/saveTableRow.jsp?parentDataId="+parentDataId+"&columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
+					var fullURL=document.location.href;
+					var strUrl = "";
+					if(fullURL.includes("table.jsp"))
+					{
+						strUrl = document.location.href.split("table.jsp")[0]+"API/saveTableRow.jsp?parentDataId="+parentDataId+"&columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
+					}
+					else
+					{
+						strUrl = document.location.href.split("relatedTable.jsp")[0]+"API/saveTableRow.jsp?parentDataId="+parentDataId+"&columns="+tableColumns+"&columnData="+columnData+"&objectType="+objectType;
+					}
+					
 					var result = httpGet(encodeURI(strUrl));
 					objectId = result.replace("true", "");
 					if(result.indexOf("true")!=-1)
@@ -113,6 +142,53 @@ function httpGet(theUrl)
 
 					$.magnificPopup.open({
 						items: {
+							src: '#dialogRemove',
+							type: 'inline'
+						},
+						preloader: false,
+						modal: true,
+						callbacks: {
+							change: function() {
+								_self.dialogRemove.$confirmRemove.on( 'click', function( e ) {
+									e.preventDefault();
+									debugger;
+									var objectDataId="";
+									if($row[0].cells[0].childNodes[0].nodeName=="A")
+										objectDataId=$row[0].cells[0].childNodes[0].innerHTML;
+									else
+										objectDataId=$row[0].cells[0].childNodes[0].data;
+									
+									var fullURL=document.location.href;
+									var strUrl = "";
+									if(fullURL.includes("table.jsp"))
+									{
+										strUrl = document.location.href.split("table.jsp")[0]+"API/removeTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType+"&parentDataId="+parentDataId;
+									}
+									else
+									{
+										strUrl = document.location.href.split("relatedTable.jsp")[0]+"API/removeTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType+"&parentDataId="+parentDataId;
+									}
+									
+									var result = httpGet(encodeURI(strUrl));
+									
+									_self.rowRemove( $row );
+									
+									$.magnificPopup.close();
+								});
+							},
+							close: function() {
+								_self.dialogRemove.$confirmRemove.off( 'click' );
+							}
+						}
+					});
+				})
+				.on( 'click', 'a.delete-row', function( e ) {
+					e.preventDefault();
+
+					var $row = $(this).closest( 'tr' );
+
+					$.magnificPopup.open({
+						items: {
 							src: '#dialog',
 							type: 'inline'
 						},
@@ -129,7 +205,17 @@ function httpGet(theUrl)
 									else
 										objectDataId=$row[0].cells[0].childNodes[0].data;
 									
-									var strUrl = document.location.href.split("table.jsp")[0]+"API/deleteTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType;
+									var fullURL=document.location.href;
+									var strUrl = "";
+									if(fullURL.includes("table.jsp"))
+									{
+										strUrl = document.location.href.split("table.jsp")[0]+"API/deleteTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType;
+									}
+									else
+									{
+										strUrl = document.location.href.split("relatedTable.jsp")[0]+"API/deleteTableRow.jsp?objectDataId="+objectDataId+"&objectTypeName="+objectType;
+									}
+									
 									var result = httpGet(encodeURI(strUrl));
 									
 									_self.rowRemove( $row );
@@ -153,6 +239,38 @@ function httpGet(theUrl)
 				e.preventDefault();
 				$.magnificPopup.close();
 			});
+			
+			this.$addExistingButton.on( 'click', function(e) {
+				e.preventDefault();
+				
+				$.magnificPopup.open({
+					items: {
+						src: '#dialogRemove',
+						type: 'inline'
+					},
+					preloader: false,
+					modal: true,
+					callbacks: {
+						change: function() {
+							_self.dialogRemove.$confirmRemove.on( 'click', function( e ) {
+								e.preventDefault();
+								
+								_self.rowRemove( $row );
+								$.magnificPopup.close();
+							});
+						},
+						close: function() {
+							_self.dialogRemove.$confirm.off( 'click' );
+						}
+					}
+				});
+			});
+
+			this.dialogRemove.$cancelRemove.on( 'click', function( e ) {
+				e.preventDefault();
+				debugger;
+				$.magnificPopup.close();
+			});
 
 			return this;
 		},
@@ -170,7 +288,8 @@ function httpGet(theUrl)
 				'<a href="#" class="hidden on-editing save-row"><i class="fa fa-save"></i></a>',
 				'<a href="#" class="hidden on-editing cancel-row"><i class="fa fa-times"></i></a>',
 				'<a href="#" class="on-default edit-row"><i class="fa fa-pencil"></i></a>',
-				'<a href="#" class="on-default remove-row"><i class="fa fa-trash-o"></i></a>'
+				'<a href="#" class="on-default delete-row"><i class="fa fa-trash-o"></i></a>',
+				'<a href="#" class="on-default remove-row"><i class="fa fa-unlink"></i></a>'
 			].join(' ');
 			
 			var cnt=0;
@@ -195,7 +314,7 @@ function httpGet(theUrl)
 
 			this.datatable.order([0,'asc']).draw(); // always show fields
 		},
-
+		
 		rowCancel: function( $row ) {
 			var _self = this,
 				$actions,

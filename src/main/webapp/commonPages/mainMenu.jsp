@@ -1,5 +1,6 @@
 <%@page import="idream2.main.core.ObjectData"%>
 <%@page import="idream2.main.core.Util"%>
+<%@page import="idream2.main.core.Context"%>
 <%@page import="com.mongodb.BasicDBObject"%>
 <%@page import="org.bson.Document"%>
 <%@page import="com.mongodb.client.FindIterable"%>
@@ -21,26 +22,20 @@
 				<ul class="nav nav-main">
 					<%
 					BasicDBObject findMenu=new BasicDBObject();
-					findMenu.append("mainMenu", "true");
-					FindIterable<Document> docsMenuList = Util.findMany("id_Menu", findMenu);
+					findMenu.append("type", "Objects");
+					findMenu.append("displayMainMenu", "true");
+					FindIterable<Document> docsMenuList = Util.findMany(Context.strCollectionName, findMenu);
 					String strSelectedMenu = request.getParameter("selectedMenu");
 					for(Document docMenu:docsMenuList)
 					{	
-						String strURL = docMenu.get("url").toString();
+						String strURL = "";
 						String strClass = "";
 						
-						if(Util.checkEmpty(strURL))
-						{
-							strURL =  "";
-							strClass = "nav-parent";
-						}
-						else
-						{
-							strURL =  "href='"+docMenu.get("url").toString()+"&selectedMenu="+docMenu.getObjectId("_id")+"'";
-						}
+						strURL =  "href='table.jsp?objectType="+docMenu.get("name").toString()+"&selectedMenu="+docMenu.getObjectId("_id")+"&mainMenu=true&pageName="+docMenu.get("displayName").toString()+"'";
+						
 						if(!Util.checkEmpty(strSelectedMenu) && strSelectedMenu.contains(docMenu.getObjectId("_id").toString()))
 						{
-							strClass+=" nav-expanded nav-active";
+							strClass+=" nav-active";
 						}
 					%>
 					<li class="<%=strClass%>">
@@ -48,33 +43,14 @@
 							<i class="<%=  docMenu.get("icon").toString()%>" aria-hidden="true"></i>
 							<span><%= docMenu.get("displayName").toString()%></span>
 						</a>
-						<%
-						BasicDBObject findMenuChild=new BasicDBObject();
-						findMenuChild.append("objectId", docMenu.getObjectId("_id"));
-						FindIterable<Document> docsMenuListChild = Util.findMany("id_Menu", findMenuChild);
-						for(Document docMenuChild:docsMenuListChild)
-						{
-							String strClassChild = "";
-							if(!Util.checkEmpty(strSelectedMenu) && strSelectedMenu.contains(docMenuChild.getObjectId("_id").toString()))
-							{
-								strClassChild="nav-active";
-							}
-						%>
-						<ul class="nav nav-children">
-							<li class="<%=strClassChild%>">
-								<a href="<%=docMenuChild.get("url").toString()%>&selectedMenu=<%=docMenu.getObjectId("_id")+":"+docMenuChild.getObjectId("_id")%>">
-									<i class="<%=  docMenuChild.get("icon").toString() %>"></i>
-									<span><%= docMenuChild.get("displayName").toString() %></span>
-								</a>
-							</li>
-						</ul>
-						<%
-						}
-						%>
+						
 					</li>
 					<%
 					}
 					%>
+					
+					
+					
 				</ul>
 			</nav>
 		</div>

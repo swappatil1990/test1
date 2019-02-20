@@ -1,3 +1,9 @@
+<%@page import="idream2.main.core.ObjectData"%>
+<%@page import="idream2.main.core.Util"%>
+<%@page import="idream2.main.UI.tableColumnConstants"%>
+<%@page import="com.mongodb.BasicDBObject"%>
+<%@page import="org.bson.Document"%>
+<%@page import="com.mongodb.client.FindIterable"%>
 
 <!doctype html>
 <html class="fixed">
@@ -29,7 +35,7 @@
 
 		<!-- Theme CSS -->
 		<link rel="stylesheet" href="assets/stylesheets/theme.css" />
-
+		<link rel="stylesheet" href="assets/stylesheets/jquery.dataTables.min.css" />
 		<!-- Skin CSS -->
 		<link rel="stylesheet" href="assets/stylesheets/skins/default.css" />
 
@@ -41,28 +47,66 @@
 
 	</head>
 	<body>
-		<section class="body">
-
-			<!-- start: header -->
-			<%@ include file = "commonPages/header.jsp" %>
-			<!-- end: header -->
 			
-			<div class="inner-wrapper">
-				<!-- start: sidebar -->
-				<%@ include file = "commonPages/mainMenu.jsp" %>
-				<!-- end: sidebar -->
-
-				<section role="main" class="content-body">
-					<!-- start: navigation-->
-					<%@ include file = "commonPages/navigationBar.jsp" %>
-					<!-- end: navigation-->
-										
+			
+					<%@ include file = "commonPages/tablePreProcess.jsp" %>
+											
 					<!-- start: page -->
-								<%@ include file = "relatedTable.jsp" %>
+					<section class="panel">
+							<div class="panel-body">
+							<span>Select Data row from search result table...</span>
+								<table class="table table-bordered table-striped mb-none" id="datatable-editable">
+									<div class="mb-md">
+										<button id="addToTable" class="btn btn-primary">Submit <i class="fa fa-plus"></i></button>
+										<button id="cancelAddExisting" class="btn btn-primary">Cancel <i class="fa fa-ban"></i></button>
+									</div>
+									<thead>
+										<tr>
+											
+											<%
+											for(String strColumnDisplay : arrColumnDisplayNames)
+											{
+												%>
+													<th><%=strColumnDisplay %></th>
+												<%
+											}
+											%>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										<%
+										
+										
+										for(int cntDocData=5; cntDocData < allDocs.size(); cntDocData++)
+										{
+											Document docdata = allDocs.get(cntDocData);
+										%>
+										<tr class="gradeX">
+											<%
+											String strDataId=docdata.getObjectId("_id").toString();
+											String strNestedUrl=docTableProperties.getString("nestedURL").replace("parentDataId=", "parentDataId="+strDataId);
+											for(String strColumnName: arrColumnNames)
+											{
+												%>
+												<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
+												<%
+											} 
+											%>
+											<td class="actions">
+												<button>Select</button>
+											</td>
+										</tr>
+										<%
+										}
+										%>
+									</tbody>
+								</table>
+								
+							</div>
+						</section>
 					<!-- end: page -->
-				</section>
-			</div>
-		</section>
+				
 
 		<div id="dialog" class="modal-block mfp-hide">
 			<section class="panel">
@@ -110,5 +154,25 @@
 		<!-- Theme Initialization Files -->
 		<script src="assets/javascripts/theme.init.js"></script>
 
+
+		<!-- Examples -->
+		<script>
+		
+		var nullColumn = [<%=JSColumnProperties%>];
+		var blankColumn = [<%=JSColumnClass%>];
+		var tableColumns = '<%=JSColumnNames%>';
+		var objectType = "<%=strObjectType%>";
+		var parentDataId = "<%=strParentDataId%>";
+		var rowSelection = "<%=strRowSelection%>";
+		var lastUrl = "<%=strLastUrl%>";
+		function clickOnRelatedURL(url)
+		{
+			debugger;
+			parent.location.href=url;
+		}
+
+		
+		</script>
+		<script src="assets/javascripts/tables/examples.datatables.search.js"></script>
 	</body>
 </html>

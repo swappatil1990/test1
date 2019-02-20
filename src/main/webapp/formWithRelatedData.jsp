@@ -118,95 +118,47 @@
 							<div class="panel-body">
 								<div class="tabs">
 									<ul class="nav nav-tabs">
-										<li>
-											<a href="#popular" data-toggle="tab">Popular</a>
+										<%
+										if(connections!=null)
+										for(int i=0;i<connections.length;i++)
+										{
+											String strClass="";
+											if(i==0)
+											{
+												strClass="class='active'";
+											}
+										%>
+										
+										<li <%=strClass %>>
+											<a href="#<%=connections[i] %>" data-toggle="tab"><%=connections[i]%></a>
 										</li>
-										<li class="active">
-											<a href="#recent" data-toggle="tab">Recent</a>
-										</li>
+										<%
+										}
+										%>
 									</ul>
 									<div class="tab-content">
-										
-										<div id="recent" class="tab-pane active">
-											<div class="row">
-												<div class="col-sm-6">
-													<div class="mb-md">
-														<button id="addToTable" class="btn btn-primary">Add <i class="fa fa-plus"></i></button>
-													</div>
-												</div>
-											</div>
-											
-											<%@ include file = "commonPages/relatedTablePreProcess.jsp" %>
-											
-											<table class="table table-bordered table-striped mb-none" id="datatable-editable">
-												<thead>
-													<tr>
-														
-														<%
-														for(String strColumnDisplay : arrColumnDisplayNames)
-														{
-															%>
-																<th><%=strColumnDisplay %></th>
-															<%
-														}
-														%>
-														<th>Actions</th>
-													</tr>
-												</thead>
-												<tbody>
-													<%
-													
-													
-													for(int cntDocData=5; cntDocData < allRDocs.size(); cntDocData++)
-													{
-														Document docdata = allRDocs.get(cntDocData);
-													%>
-													<tr class="gradeX">
-														<%
-														String strDataId=docdata.getObjectId("_id").toString();
-														String strNestedUrl=docTableProperties.getString("nestedURL").replace("parentDataId=", "parentDataId="+strDataId);
-														for(String strColumnName: arrColumnNames)
-														{
-															if(strColumnName.equals("_id"))
-															{
-															%>
-																<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><a href="<%=strNestedUrl%>"><%=  docdata.get(strColumnName)%></a></td>
-															<%
-															}
-															else
-															{
-																%>
-																<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
-																<%
-															}
-														} 
-														%>
-														<td class="actions">
-															<a href="#" class="hidden on-editing save-row"><i class="fa fa-save"></i></a>
-															<a href="#" class="hidden on-editing cancel-row"><i class="fa fa-times"></i></a>
-															<a href="#" class="on-default edit-row"><i class="fa fa-pencil"></i></a>
-															<a href="#" class="on-default remove-row"><i class="fa fa-trash-o"></i></a>
-														</td>
-													</tr>
-													<%
-													}
-													%>
-												</tbody>
-											</table>
+										<%
+										if(connections!=null)
+										for(int i=0;i<connections.length;i++)
+										{
+											String strClass="";
+											if(i==0)
+											{
+												strClass=" active";
+											}
+										%>
+										<div id="<%=connections[i]%>" class="tab-pane <%=strClass%>">
+											<iframe src="http://localhost:8080/SampleApp/relatedTable.jsp?objectType=<%=connections[i] %>&parentDataId=<%=strParentDataId %>" height="500" width="100%" frameborder=0></iframe>
 										</div>
-										<div id="popular" class="tab-pane">
-											<p>Popular</p>
-											<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitat.</p>
-										</div>
+										<%
+										}
+										%>
 									</div>
 								</div>
-								
 							</div>
 						</section>
 					<!-- end: page -->
 				</section>
-				
-				
 			</div>
 		</section>
 
@@ -284,17 +236,6 @@
 		<!-- Theme Initialization Files -->
 		<script src="assets/javascripts/theme.init.js"></script>
 
-
-		<script>
-		debugger;
-		var nullColumn = [<%=JSColumnProperties%>];
-		var blankColumn = [<%=JSColumnClass%>];
-		var tableColumns = '<%=JSColumnNames%>';
-		var objectType = "<%=strObjectType%>";
-		var parentDataId = "<%=strParentDataId%>";
-		</script>
-		<!-- Examples Table -->
-		<script src="assets/javascripts/tables/examples.datatables.editable.js"></script>
 		
 		
 		<!-- Examples Form -->

@@ -87,8 +87,8 @@ public class tableColumnConstants {
 		adminTable.put("schema_Manager_Prop", "{'bSortable': false },null,null,null,null,null,null,null");
 		adminTable.put("schema_Manager_Class", "'noEdit','','','','','','',''");
 		
-		adminTable.put("common", "_id,name,displayName,status");
-		adminTable.put("common_Display", "Id,Name,Display Name,Status");
+		adminTable.put("common", "_id,name,version,status");
+		adminTable.put("common_Display", "Id, Name, Version, Status");
 		adminTableTitle.put("common", "");
 		adminTable.put("common_Nos", "1,2,3,4");
 		adminTable.put("common_Prop", "{'bSortable': false },null,null,null");

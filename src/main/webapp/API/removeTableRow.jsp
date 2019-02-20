@@ -12,17 +12,11 @@
 out.clear();
 
 String strObjectId = request.getParameter("objectDataId");
+String strParentDataId = request.getParameter("parentDataId");
 String strObjectTypeName = request.getParameter("objectTypeName");
 
 BasicDBObject findCondition = new BasicDBObject();
-Document docSingle=new Document();
-docSingle.append("objectId", strObjectId);
-findCondition.append("connections", docSingle);
-FindIterable<Document> docResult=Util.findMany(Context.strDataCollectionName, findCondition);
-for(Document doc: docResult)
-{
-	Util.deleteObjectToObject(doc.getObjectId("_id").toString(), Context.strDataCollectionName, docSingle);	
-}
-Util.delete(strObjectId, Context.strDataCollectionName);
-out.print("true");
+
+String strResult = Util.disconnectObjectObject(strParentDataId,strObjectId, Context.strDataCollectionName);
+out.print(strResult);
 %>
