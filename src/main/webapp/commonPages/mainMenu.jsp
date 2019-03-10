@@ -1,9 +1,12 @@
+<%@page import="org.bson.conversions.Bson"%>
 <%@page import="idream2.main.core.ObjectData"%>
 <%@page import="idream2.main.core.Util"%>
+<%@page import="idream2.main.core.ObjectType"%>
 <%@page import="idream2.main.core.Context"%>
 <%@page import="com.mongodb.BasicDBObject"%>
 <%@page import="org.bson.Document"%>
 <%@page import="com.mongodb.client.FindIterable"%>
+<%@page import="com.mongodb.client.model.Sorts.*"%>
 
 <aside id="sidebar-left" class="sidebar-left">
 				
@@ -21,10 +24,9 @@
 			<nav id="menu" class="nav-main" role="navigation">
 				<ul class="nav nav-main">
 					<%
-					BasicDBObject findMenu=new BasicDBObject();
-					findMenu.append("type", "Objects");
-					findMenu.append("displayMainMenu", "true");
-					FindIterable<Document> docsMenuList = Util.findMany(Context.strCollectionName, findMenu);
+					
+					FindIterable<Document> docsMenuList = ObjectType.getAllSchemaObjectTypesForMenu(context);
+					
 					String strSelectedMenu = request.getParameter("selectedMenu");
 					for(Document docMenu:docsMenuList)
 					{	

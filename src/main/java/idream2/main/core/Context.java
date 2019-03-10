@@ -1,23 +1,28 @@
 package idream2.main.core;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
 
 import org.bson.Document;
 
 import com.mongodb.BasicDBObject;
 
 public class Context extends Constants{
-	public static String strUser="";
-	public static String strCollectionName="";
-	public static String strDataCollectionName="";
-	static ArrayList<String> arrHrefList=new ArrayList<>();
-	static ArrayList<String> arrHrefHeaderList=new ArrayList<>();
+	public String strUser="";
+	public String strCollectionName="";
+	public String strDataCollectionName="";
+	public String strSuperAdminCollectionName="id_AdminObjectData";
+	ArrayList<String> arrHrefList=new ArrayList<>();
+	ArrayList<String> arrHrefHeaderList=new ArrayList<>();
 	String strPassword="";
-	public static String contextId="";
-	public static boolean flagLogin = true;
-	public static boolean strAdminSchemaAccess=false;
-	public static boolean strSuperUIAccess=false;
-	public static String designation="";
+	public String contextId="";
+	public boolean flagLogin = true;
+	public boolean strAdminSchemaAccess=false;
+	public boolean strSuperUIAccess=false;
+	public String designation="";
+	
 	public String login(String strUser, String strPassword) throws Exception
 	{
 		try {
@@ -25,7 +30,7 @@ public class Context extends Constants{
 			
 			BasicDBObject findCondition=new BasicDBObject();
 			findCondition.append(FIELD_NAME, strUser);
-			Document doc = Util.find("id_User", findCondition);
+			Document doc = Util.find("id_User", findCondition, this);
 			if(doc.get(FIELD_PASSWORD).toString().equals(strPassword))
 			{
 				contextId=doc.getObjectId(ID).toString();
@@ -45,7 +50,7 @@ public class Context extends Constants{
 			throw e;
 		}
 	}
-	public static void logout() throws Exception
+	public void logout() throws Exception
 	{
 		flagLogin=true;
 		contextId="";
@@ -53,20 +58,20 @@ public class Context extends Constants{
 		strAdminSchemaAccess=false;
 		strSuperUIAccess=false;
 	}
-	public static boolean checkContext(String strId) throws Exception
+	public boolean checkContext(String strId) throws Exception
 	{
 		if(contextId.equals(strId))
 			return true;
 		else
 			return false;
 	}
-	public static Context getContext() throws Exception
+	public Context getContext() throws Exception
 	{
 		Context cnt=new Context();
 		return cnt;
 	}
 	
-	public static void setHref(String strHeader, String strHref)
+	public void setHref(String strHeader, String strHref)
 	{
 		if(!arrHrefList.contains(strHref))
 		{
@@ -76,8 +81,6 @@ public class Context extends Constants{
 		else
 		{
 			int index=arrHrefList.indexOf(strHref);
-			System.out.println("-------index------"+index);
-			System.out.println("----------arrHrefList.size()---"+arrHrefList.size());
 			
 			for(int i=arrHrefList.size()-1;i>(index);i--)
 			{
@@ -87,7 +90,7 @@ public class Context extends Constants{
 		}
 	}
 	
-	public static String getHref()
+	public String getHref()
 	{
 		String strResult="";
 		int cnt=0;
@@ -104,7 +107,7 @@ public class Context extends Constants{
 		return strResult;
 	}
 	
-	public static String getLastHref()
+	public String getLastHref()
 	{
 		if(arrHrefList.size()>0)
 			return arrHrefList.get(arrHrefList.size()-1);
@@ -112,9 +115,59 @@ public class Context extends Constants{
 			return "";
 	}
 	
-	public static void clearHref()
+	public void clearHref()
 	{
 		arrHrefHeaderList.clear();
 		arrHrefList.clear();
+	}
+	
+	public String getDataCollectionName()
+	{
+		return strDataCollectionName;
+	}
+	
+	public String getSuperAdminCollectionName()
+	{
+		return strSuperAdminCollectionName;
+	}
+	
+	public String getCollectionName()
+	{
+		return strCollectionName;
+	}
+	
+	public String getUserName()
+	{
+		return strUser;
+	}
+	
+	public boolean getFlagLogin()
+	{
+		return flagLogin;
+	}
+	
+	public String getContextId()
+	{
+		return contextId;
+	}
+	
+	public void setContextId(String strContextId)
+	{
+		contextId = strContextId;
+	}
+	
+	public void createContextFromSession(HttpSession session) throws Exception
+	{
+		try
+		{
+			login(session.getAttribute("sessionUserName").toString(), session.getAttribute("sessionUserPass").toString());
+			strCollectionName = session.getAttribute("strCollectionName").toString();
+			strDataCollectionName = session.getAttribute("strDataCollectionName").toString();
+		}
+		catch(Exception e)
+		{
+			throw new Exception("Error in Login Context.....");
+		}
+		//Util.checkSessions();
 	}
 }

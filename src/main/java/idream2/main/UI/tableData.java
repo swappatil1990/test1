@@ -10,15 +10,19 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 
 import idream2.main.core.Context;
+import idream2.main.core.ObjectData;
+import idream2.main.core.ObjectType;
 import idream2.main.core.Util;
 
 public class tableData {
 	
 	public static ArrayList<Document> getCommonTableData(Map<String, Object> docRequest)
 	{
+		Context context = null;
+		if(docRequest.get("context")!=null)
+			context = (Context)docRequest.get("context");
 		try
 		{
-			System.out.println("========= Inside getAdminObjectType");
 			ArrayList<Document> tableData=new ArrayList<Document>();
 			String strParentDataId = (String)docRequest.get("parentDataId");
 			String strTableName = (String)docRequest.get("tableName");
@@ -26,7 +30,7 @@ public class tableData {
 			String strPageType = (String)docRequest.get("pageType");
 			BasicDBObject findCondition=new BasicDBObject();
 			findCondition.append("name", strTableName);
-			Document docTable = Util.find("id_Tables", findCondition);
+			Document docTable = Util.find("id_Tables", findCondition, context);
 			String strObjectType =(String)docRequest.get("objectType");
 			String strDisplayName = "";
 			if(docTable==null)
@@ -57,16 +61,12 @@ public class tableData {
 			Document docColumnNos=new Document();
 			Document docColumnClass=new Document();
 			Document docColumnProperties=new Document();
-			
+			Document docColumnData=new Document();
 		
 			String strSearchKey="common";
 			
 
-			BasicDBObject findColumns=new BasicDBObject();
-			findColumns.append("type", "Objects");
-			findColumns.append("name", strObjectType);
-			
-			Document docColumns = Util.find(Context.strCollectionName, findColumns);
+			Document docColumns = ObjectType.getSchemaObjectType(strObjectType, context);
 			ArrayList<Document> arrColumnDoc=null;
 			if(docColumns!=null)
 			{
@@ -94,9 +94,6 @@ public class tableData {
 			}
 			else
 			{
-				
-				System.out.println("------------------------arrColumnDoc "+arrColumnDoc);
-				System.out.println("------------------------arrColumnDoc Size "+arrColumnDoc.size());
 				int arrayCount = arrColumnDoc.size()+1;
 				arrColumnNames = new String[arrayCount];
 				arrColumnDisplayNames = new String[arrayCount];
@@ -113,20 +110,79 @@ public class tableData {
 				arrColumnClassName[cnt]="'noEdit'";
 				
 				docColumnClass.append("_id", "'noEdit'");
+				docColumnData.append("_id", "");
 				docColumnProperties.append("_id", "{'bSortable': false }");
 				docColumnDisplayName.append("_id", "id");
 				docColumnNos.append("_id", cnt+"");
 				cnt++;
 				for(Document docTemp: arrColumnDoc)
 				{
-					BasicDBObject findColumn=new BasicDBObject();
-					findColumn.append("_id", new ObjectId(docTemp.getString("objectId")));
-					Document docColumn = Util.find(Context.strCollectionName, findColumn);
+					Document docColumn = ObjectData.getSchemaObjectData(docTemp.getString("objectId"), context);
+					String strColumnClassData = "";
+					try
+					{
+						strColumnClassData = ObjectData.getSuperSchemaObjectDataName(docColumn.getObjectId("inputType").toString(), context);
+					}
+					catch (Exception e) {
+						// TODO: handle exception
+					}
 					
-					docColumnClass.append(docColumn.getString("name"), "''");
+					docColumnClass.append(docColumn.getString("name"), "'"+strColumnClassData+"'");
 					docColumnProperties.append(docColumn.getString("name"), "null");
 					docColumnDisplayName.append(docColumn.getString("name"), docColumn.getString("displayName"));
-					docColumnNos.append(docColumn.getString("name"), cnt+"");
+					docColumnNos.append(docColumn.getString("name"),  docColumn.getString("sequence"));
+					if(strColumnClassData.equals("list"))
+					{
+						String strOptionList = "<option></option>";
+						String strOptionListWithValues = "";
+						try
+						{
+							//Document doc=ObjectData.getObjectData("Lists", docColumn.getString("listName"), "");
+							Document doc=ObjectData.getSchemaObjectData("Lists", ObjectData.getSchemaObjectDataName(docColumn.getObjectId("listName").toString(), context), "", context);
+							ArrayList<Document> arrDocs = (ArrayList<Document>) doc.get("connections");
+							
+							for(Document docTmp : arrDocs)
+							{
+								Document docResult = ObjectData.getSchemaObjectData(docTmp.getString("objectId"), context);
+								if(docResult!=null)
+								{
+									strOptionList += "<option>"+docResult.getString("name")+"</option>";
+									strOptionListWithValues +=docResult.getObjectId("_id").toString()+":"+docResult.getString("name")+",";
+								}
+							}
+						}
+						catch (Exception e) {
+							// TODO: handle exception
+						}
+						docColumnData.append(docColumn.getString("name"), strOptionList);
+						docColumnData.append(docColumn.getString("name")+"Arr", strOptionListWithValues);
+					}
+					else if(strColumnClassData.equals("object"))
+					{
+						String strOptionList ="<option></option>";
+						String strOptionListWithValues ="";
+						try
+						{
+							FindIterable<Document> arrDocs=ObjectData.getAllObjectData(ObjectData.getSuperSchemaObjectDataName(docColumn.getObjectId("objectName").toString(), context), context);
+							//ArrayList<Document> arrDocs = (ArrayList<Document>) doc.get("connections");
+							
+							
+							for(Document docTmp : arrDocs)
+							{
+								strOptionList += "<option>"+docTmp.getString("name")+"</option>";
+								strOptionListWithValues += docTmp.getObjectId("_id").toString()+":"+docTmp.getString("name")+",";
+							}
+						}
+						catch (Exception e) {
+							// TODO: handle exception
+						}
+						docColumnData.append(docColumn.getString("name"), strOptionList);
+						docColumnData.append(docColumn.getString("name")+"Arr", strOptionListWithValues);
+					}
+					else
+					{
+						docColumnData.append(docColumn.getString("name"), "");
+					}
 				}
 			}
 			docTablePropertie.append("tableTitle", strTableTitle);
@@ -138,37 +194,28 @@ public class tableData {
 			tableData.add(docColumnProperties);
 			tableData.add(docColumnDisplayName);
 			tableData.add(docColumnNos);
+			tableData.add(docColumnData);
 			
-			System.out.println("========= strParentDataId");
-			
-			BasicDBObject findData=new BasicDBObject();
 			if(!Util.checkEmpty(strParentDataId) && (strPageType==null || !strPageType.equals("Search")))
 			{
-				findData.append("_id", new ObjectId(strParentDataId));
-				Document doc = Util.find(Context.strDataCollectionName, findData);
+				Document doc = ObjectData.getObjectData(strParentDataId, context);
+				
 				ArrayList<Document> arrDocs = (ArrayList<Document>) doc.get("connections");
 				if(arrDocs!=null)
 				for(Document docTemp : arrDocs)
 				{
-					BasicDBObject findRelatedData=new BasicDBObject();
-					findRelatedData.append("_id", new ObjectId(docTemp.getString("objectId")));
-					findRelatedData.append("type", strObjectType);
-					System.out.println("========= docTemp.getString(\"objectId\") "+docTemp.getString("objectId"));
-					System.out.println("========= strObjectType "+strObjectType);
-					Document docResult = Util.find(Context.strDataCollectionName, findRelatedData);
+					Document docResult = ObjectData.getObjectData(docTemp.getString("objectId"), strObjectType, context);
+					
 					if(docResult!=null)
 						tableData.add(docResult);
 				}
 			}
 			else
 			{
-				System.out.println("========= strObjectType Data insert start ");
-				findData.append("type", strObjectType);
-				FindIterable<Document> docs = Util.findMany(Context.strDataCollectionName, findData);
+				FindIterable<Document> docs = ObjectData.getAllObjectData(strObjectType, context);
 				for (Document doc : docs) {
 					tableData.add(doc);
 		        }
-				System.out.println("========= strObjectType Data insert End ");
 			}
 			return tableData;
 		}
@@ -177,68 +224,5 @@ public class tableData {
 			e.printStackTrace();
 			return null;
 		}
-	}
-	
-	
-	public static ArrayList<Document> getElementData(Map<String, Object> docRequest) throws Exception
-	{
-		ArrayList<Document> tableData=new ArrayList<Document>();
-		String strObjectType = (String)docRequest.get("objectType");
-		String strAdminTable = (String)docRequest.get("adminTable");
-		String strParentDataId = (String)docRequest.get("parentDataId");
-		String[] arrColumnNames = null;
-		String[] arrColumnDisplayNames = null;
-		String[] arrColumnNos = null;
-		String[] arrColumnPropeties = null;
-		String[] arrColumnClassName = null;
-		String strTableTitle = null;
-		String JSPostProcessURL = "";
-		String nestedURL = "";
-		//
-		Document docColumnDisplayName=new Document();
-		Document docTablePropertie=new Document();
-		Document docColumnNos=new Document();
-		Document docColumnClass=new Document();
-		Document docColumnProperties=new Document();
-		
-		if(strAdminTable.equals("true"))
-		{
-			arrColumnNames = ((String)tableColumnConstants.adminTable.get(strObjectType)).split(",");
-			arrColumnDisplayNames = ((String)tableColumnConstants.adminTable.get(strObjectType+"_Display")).split(",");
-			strTableTitle = ((String)tableColumnConstants.adminTableTitle.get(strObjectType));
-			arrColumnNos = ((String)tableColumnConstants.adminTable.get(strObjectType+"_Nos")).split(",");
-			arrColumnPropeties = ((String)tableColumnConstants.adminTable.get(strObjectType+"_Prop")).split(",");
-			arrColumnClassName = ((String)tableColumnConstants.adminTable.get(strObjectType+"_Class")).split(",");
-		}
-		int cnt = 0;
-		for(String strColumnName : arrColumnNames)
-		{
-			docColumnDisplayName.append(strColumnName, arrColumnDisplayNames[cnt]);
-			docColumnNos.append(strColumnName, arrColumnNos[cnt]);
-			docColumnClass.append(strColumnName, arrColumnClassName[cnt]);
-			docColumnProperties.append(strColumnName, arrColumnPropeties[cnt]);
-			cnt++;
-		}
-		
-		docTablePropertie.append("tableTitle", strTableTitle);
-		docTablePropertie.append("nestedURL", nestedURL);
-		docTablePropertie.append("postProcessURL", JSPostProcessURL);
-		
-		tableData.add(docTablePropertie);
-		tableData.add(docColumnClass);
-		tableData.add(docColumnProperties);
-		tableData.add(docColumnDisplayName);
-		tableData.add(docColumnNos);
-		
-		BasicDBObject findData=new BasicDBObject();
-		if(!Util.checkEmpty(strParentDataId))
-			findData.append("objectId", new ObjectId(strParentDataId));
-		
-		FindIterable<Document> docs = Util.findMany(strObjectType, findData);
-		for (Document doc : docs) {
-			tableData.add(doc);
-        }
-		
-		return tableData;
 	}
 }

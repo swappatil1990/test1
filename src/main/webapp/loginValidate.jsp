@@ -11,8 +11,9 @@ try
 	String strContext=cont.login(strUserName, request.getParameter("password").toString());
 	if(strContext!=null && !strContext.equals(""))
 	{
-		session.setAttribute("sessionUserName",strUserName);
-		session.setAttribute("sessionContaxtId",strContext); 
+		session.setAttribute("sessionUserName", strUserName);
+		session.setAttribute("sessionUserPass", request.getParameter("password").toString());
+		session.setAttribute("sessionContaxtId", strContext);
 		response.sendRedirect("commonPages/loginOption/optionPage.jsp");
 	}
 	else

@@ -3,7 +3,7 @@ package idream2.main.core;
 import org.bson.Document;
 
 public class User extends Constants {
-	public static void insert(String strName, String strPassword) throws Exception
+	public static void insert(String strName, String strPassword, Context context) throws Exception
 	{
 		//ObjectType.create("User", "Admin", "", "", 4, "", 4, true);
 		Document doc=new Document();
@@ -11,7 +11,7 @@ public class User extends Constants {
 		doc.append(FIELD_SUPERUIACCESS, "true");
 		doc.append(FIELD_PASSWORD, strPassword);
 		doc.append(FIELD_NAME, strName);
-		Util.insert("id_User", doc);
+		Util.insert("id_User", doc, context);
 	}
 	
 	public static void delete(String strName) throws Exception

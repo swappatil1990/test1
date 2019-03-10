@@ -8,34 +8,33 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 
 import idream2.main.core.Constants;
+import idream2.main.core.Context;
 import idream2.main.core.Util;
 
 public class adminActionMethods extends Constants {
-	public static Object beforeInsertObjectType(Map<String, Object> docRequest) throws Exception
+	public static Object beforeInsertObjectType(Map<String, Object> docRequest, Context context) throws Exception
 	{
 		Document doc=(Document)docRequest.get("Document");
-		Util.createCollection(PREFIX_SCHEMA+doc.get("objectName").toString());
-		Util.createCollection(PREFIX_SCHEMAREV+doc.get("objectName").toString());
-		Util.createCollection(PREFIX_SCHEMAREVOBJ+doc.get("objectName").toString());
-		Util.createCollection(PREFIX_HIST_SCHEMA+doc.get("objectName").toString());
+		Util.createCollection(PREFIX_SCHEMA+doc.get("objectName").toString(), context);
+		Util.createCollection(PREFIX_SCHEMAREV+doc.get("objectName").toString(), context);
+		Util.createCollection(PREFIX_SCHEMAREVOBJ+doc.get("objectName").toString(), context);
+		Util.createCollection(PREFIX_HIST_SCHEMA+doc.get("objectName").toString(), context);
 		
 		return null;
 	}
 	
-	public static Object beforeDeleteObjectType(Map<String, Object> docRequest) throws Exception
+	public static Object beforeDeleteObjectType(Map<String, Object> docRequest, Context context) throws Exception
 	{
 		String strObjectId=(String)docRequest.get("ObjectId");
 		
 		BasicDBObject find = new BasicDBObject();
 		find.append("_id", new ObjectId(strObjectId));
-		Document doc = Util.find("id_Objects", find);
+		Document doc = Util.find("id_Objects", find, context);
 		
-		System.out.println("Inside beforeDeleteObjectType"+doc.get("objectName").toString());
-		
-		Util.deleteCollection(PREFIX_SCHEMA+doc.get("objectName").toString());
-		Util.deleteCollection(PREFIX_SCHEMAREV+doc.get("objectName").toString());
-		Util.deleteCollection(PREFIX_SCHEMAREVOBJ+doc.get("objectName").toString());
-		Util.deleteCollection(PREFIX_HIST_SCHEMA+doc.get("objectName").toString());
+		Util.deleteCollection(PREFIX_SCHEMA+doc.get("objectName").toString(), context);
+		Util.deleteCollection(PREFIX_SCHEMAREV+doc.get("objectName").toString(), context);
+		Util.deleteCollection(PREFIX_SCHEMAREVOBJ+doc.get("objectName").toString(), context);
+		Util.deleteCollection(PREFIX_HIST_SCHEMA+doc.get("objectName").toString(), context);
 		
 		return null;
 	}

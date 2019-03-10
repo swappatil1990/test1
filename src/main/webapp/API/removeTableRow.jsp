@@ -9,6 +9,9 @@
     pageEncoding="ISO-8859-1"%>
 
 <%
+Context context=new Context();
+context.createContextFromSession(session);
+
 out.clear();
 
 String strObjectId = request.getParameter("objectDataId");
@@ -17,6 +20,6 @@ String strObjectTypeName = request.getParameter("objectTypeName");
 
 BasicDBObject findCondition = new BasicDBObject();
 
-String strResult = Util.disconnectObjectObject(strParentDataId,strObjectId, Context.strDataCollectionName);
+String strResult = Util.disconnectObjectObject(strParentDataId,strObjectId, context.getDataCollectionName(), context);
 out.print(strResult);
 %>

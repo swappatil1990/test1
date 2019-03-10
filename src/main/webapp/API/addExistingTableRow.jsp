@@ -8,15 +8,16 @@
     pageEncoding="ISO-8859-1"%>
 
 <%
+Context context=new Context();
+context.createContextFromSession(session);
+
 out.clear();
 
 String strobjectType = request.getParameter("objectType");
 String strParentDataId = request.getParameter("parentDataId");
 String strSelectedDataId = request.getParameter("selectedDataId");
-System.out.println("-@@@@@@@@@@@------------------strParentDataId :"+strParentDataId);
-System.out.println("-------------------strSelectedDataId :"+strSelectedDataId);
 
-String strObjectId = Util.connectObjectToObject(strParentDataId, strSelectedDataId, Context.strCollectionName);
+String strObjectId = Util.connectObjectToObject(strParentDataId, strSelectedDataId, context.getDataCollectionName(), strobjectType, context);
 
 out.print("true"+strObjectId);
 %>

@@ -37,13 +37,8 @@
 	ArrayList<Document> allDocs = null;
 	try
 	{
-		System.out.println("========="+strObjectType);
-		System.out.println("========="+strAdminTable);
-		System.out.println("========="+strAddMethod.split(":")[0]);
-		System.out.println("========="+strAddMethod.split(":")[1]);
 		//allDocs  = tableData.getAdminObjectType(docRequest);
 		allDocs=(ArrayList<Document>)Util.callMethod(strAddMethod.split(":")[0], strAddMethod.split(":")[1], ArgMap);
-		System.out.println("=========DONE ");
 	}
 	catch(Exception e)
 	{

@@ -47,7 +47,11 @@
 
 	</head>
 	<body>
-			
+					<%
+					Context contextInner=new Context();
+					contextInner.createContextFromSession(session);
+
+					%>
 			
 					<%@ include file = "commonPages/tablePreProcess.jsp" %>
 											
@@ -78,7 +82,7 @@
 										<%
 										
 										
-										for(int cntDocData=5; cntDocData < allDocs.size(); cntDocData++)
+										for(int cntDocData=6; cntDocData < allDocs.size(); cntDocData++)
 										{
 											Document docdata = allDocs.get(cntDocData);
 										%>
@@ -88,9 +92,26 @@
 											String strNestedUrl=docTableProperties.getString("nestedURL").replace("parentDataId=", "parentDataId="+strDataId);
 											for(String strColumnName: arrColumnNames)
 											{
-												%>
-												<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
-												<%
+												if(docColumnClass.get(strColumnName).equals("'list'")|| docColumnClass.get(strColumnName).equals("'object'"))
+												{
+													
+													String strObjectDataName = "";
+													try
+													{
+														strObjectDataName = ObjectData.getObjectDataName(docdata.get(strColumnName).toString(), contextInner);
+													}
+													catch(Exception e)
+													{}
+													%>
+													<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%= strObjectDataName %></td>
+													<%
+												}
+												else
+												{
+													%>
+													<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
+													<%
+												}
 											} 
 											%>
 											<td class="actions">
@@ -157,7 +178,6 @@
 
 		<!-- Examples -->
 		<script>
-		
 		var nullColumn = [<%=JSColumnProperties%>];
 		var blankColumn = [<%=JSColumnClass%>];
 		var tableColumns = '<%=JSColumnNames%>';
@@ -167,7 +187,6 @@
 		var lastUrl = "<%=strLastUrl%>";
 		function clickOnRelatedURL(url)
 		{
-			debugger;
 			parent.location.href=url;
 		}
 

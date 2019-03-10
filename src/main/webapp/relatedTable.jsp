@@ -47,7 +47,11 @@
 
 	</head>
 	<body>
-			
+			<%
+			Context contextInner=new Context();
+			contextInner.createContextFromSession(session);
+
+			%>
 			
 					<%@ include file = "commonPages/tablePreProcess.jsp" %>
 											
@@ -72,8 +76,9 @@
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="mb-md">
+										
 										<%
-											String strParam=request.getQueryString()+"&selectRow=single&pageType=Search&prevUrl=";
+											String strParam=request.getQueryString()+"&objectType="+strObjectType+"&selectRow=single&pageType=Search&prevUrl=";
 											
 										%>
 											<form action="searchTable.jsp?<%=strParam%>" method="post">
@@ -90,6 +95,7 @@
 										</div>
 									</div>
 								</div>
+								
 								<table class="table table-bordered table-striped mb-none" id="datatable-editable">
 									<thead>
 										<tr>
@@ -109,7 +115,7 @@
 										<%
 										
 										
-										for(int cntDocData=5; cntDocData < allDocs.size(); cntDocData++)
+										for(int cntDocData=6; cntDocData < allDocs.size(); cntDocData++)
 										{
 											Document docdata = allDocs.get(cntDocData);
 										%>
@@ -133,9 +139,44 @@
 												}
 												else
 												{
-													%>
-													<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
-													<%
+													if(docColumnClass.get(strColumnName).equals("'list'"))
+													{
+														
+														String strObjectDataName = "";
+														try
+														{
+															strObjectDataName = ObjectData.getSchemaObjectDataName(docdata.getObjectId(strColumnName).toString(), contextInner);
+														}
+														catch(Exception e)
+														{
+															
+														}
+														%>
+														<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%= strObjectDataName %></td>
+														<%
+													}
+													else if(docColumnClass.get(strColumnName).equals("'object'"))
+													{
+														
+														String strObjectDataName = "";
+														try
+														{
+															strObjectDataName = ObjectData.getObjectDataName(docdata.getObjectId(strColumnName).toString(), contextInner);
+														}
+														catch(Exception e)
+														{
+															
+														}
+														%>
+														<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%= strObjectDataName %></td>
+														<%
+													}
+													else
+													{
+														%>
+														<td class="<%=docColumnClass.get(strColumnName).toString().replaceAll("'", "")%>"><%=  docdata.get(strColumnName)%></td>
+														<%
+													}
 												}
 											} 
 											%>
@@ -164,6 +205,29 @@
 					<!-- end: page -->
 				
 
+	<div id="dialog" class="modal-block mfp-hide">
+			<section class="panel">
+				<header class="panel-heading">
+					<h2 class="panel-title">Are you sure?</h2>
+				</header>
+				<div class="panel-body">
+					<div class="modal-wrapper">
+						<div class="modal-text">
+							<p>Are you sure that you want to delete this row?</p>
+						</div>
+					</div>
+				</div>
+				<footer class="panel-footer">
+					<div class="row">
+						<div class="col-md-12 text-right">
+							<button id="dialogConfirm" class="btn btn-primary">Confirm</button>
+							<button id="dialogCancel" class="btn btn-default">Cancel</button>
+						</div>
+					</div>
+				</footer>
+			</section>
+		</div>
+		
 		<div id="dialog" class="modal-block mfp-hide">
 			<section class="panel">
 				<header class="panel-heading">
@@ -240,8 +304,11 @@
 		var nullColumn = [<%=JSColumnProperties%>];
 		var blankColumn = [<%=JSColumnClass%>];
 		var tableColumns = '<%=JSColumnNames%>';
+		var tableColumnData = [<%=JSColumnData%>];
 		var objectType = "<%=strObjectType%>";
 		var parentDataId = "<%=strParentDataId%>";
+		var columnOptionsWithValues = [<%=JSColumnOptionsWithValues%>];
+		
 
 		function clickOnRelatedURL(url)
 		{
@@ -251,5 +318,15 @@
 		</script>
 		<script src="assets/javascripts/tables/examples.datatables.editable.js"></script>
 		<script src="assets/javascripts/tables/examples.datatables.ajax.js"></script>
+		
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="select2.min.js"></script>
+		<script>
+			$("#country").select2( {
+				placeholder: "Select Country",
+				allowClear: true
+				} );
+		</script>
 	</body>
 </html>

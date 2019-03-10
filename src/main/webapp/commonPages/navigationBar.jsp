@@ -5,12 +5,12 @@ String strMainMenu=request.getParameter("mainMenu");
 String strName=request.getParameter("pageName");
 if(strMainMenu!=null && strMainMenu.equals("true"))
 {
-	Context.clearHref();
-	Context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
+	context.clearHref();
+	context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
 }
 else
 {
-	Context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
+	context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
 }
 
 %>
@@ -26,7 +26,7 @@ else
 				
 			</li>
 			<%
-			out.print(Context.getHref());
+			out.print(context.getHref());
 			%>
 			<li><span> </span></li>
 			

@@ -69,7 +69,6 @@ function httpGet(theUrl)
 			this.$table
 				.on( 'click', 'tr', function () {
 					$(this).toggleClass('selected');
-					debugger;
 					
 					var cnt = $(this).closest( 'tbody' ).find('tr.selected').length;
 					if(cnt>0)
@@ -108,7 +107,8 @@ function httpGet(theUrl)
 		// ROW FUNCTIONS
 		// ==========================================================================================
 		AddExisting: function() {
-			var strUrl = document.location.href.split("searchTable.jsp")[0]+"API/addExistingTableRow.jsp?selectedDataId="+selectedDataId+"&objectTypeName="+objectType+"&parentDataId="+parentDataId;
+			debugger;
+			var strUrl = document.location.href.split("searchTable.jsp")[0]+"API/addExistingTableRow.jsp?selectedDataId="+selectedDataId+"&objectType="+objectType+"&parentDataId="+parentDataId;
 			var result = httpGet(strUrl);
 			parent.location.href = lastUrl;
 		},

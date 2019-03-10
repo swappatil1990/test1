@@ -8,13 +8,13 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 
 public class Events {
-	public static void runObjectEvent(String strObjectName, String strEventOn, String strEventAction, Map<String, Object> argMap) throws Exception
+	public static void runObjectEvent(String strObjectName, String strEventOn, String strEventAction, Map<String, Object> argMap, Context context) throws Exception
 	{
 		BasicDBObject findCondition=new BasicDBObject();
 		findCondition.append("objectName", strObjectName);
 		findCondition.append("eventOn", strEventOn);
 		findCondition.append("eventAction", strEventAction);
-		FindIterable<Document> docs= Util.findMany("id_ObjectEvents", findCondition);
+		FindIterable<Document> docs= Util.findMany("id_ObjectEvents", findCondition, context);
 		for(Document doc : docs)
 		{
 			String strClass = (String) doc.get("class");
@@ -23,21 +23,17 @@ public class Events {
 		}
 	}
 	
-	public static void runRelationEvent(String strRelationId, String strEventOn, String strEventAction, Map<String, Object> argMap) throws Exception
+	public static void runRelationEvent(String strRelationId, String strEventOn, String strEventAction, Map<String, Object> argMap, Context context) throws Exception
 	{
-		System.out.println("Inside runRelationEvent");
 		BasicDBObject findCondition=new BasicDBObject();
 		findCondition.append("objectName", strRelationId);
 		findCondition.append("eventOn", strEventOn);
 		findCondition.append("eventAction", strEventAction);
-		FindIterable<Document> docs= Util.findMany("id_RelationEvents", findCondition);
+		FindIterable<Document> docs= Util.findMany("id_RelationEvents", findCondition, context);
 		for(Document doc : docs)
 		{
-			System.out.println("Inside loop runRelationEvent");
 			String strClass = (String) doc.get("class");
 			String strMethod = (String) doc.get("method");
-			System.out.println("    class "+strClass);
-			System.out.println("    method "+strMethod);
 			Util.callMethod(strClass,strMethod, argMap);
 		}
 	}

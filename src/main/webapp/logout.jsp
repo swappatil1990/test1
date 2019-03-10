@@ -2,8 +2,10 @@
     pageEncoding="ISO-8859-1"%>
 <%@page import="idream2.main.core.Context"%>
 <%
+Context context=new Context();
+context.createContextFromSession(session);
 
 session.invalidate();
-Context.logout();
+context.logout();
 response.sendRedirect("index.jsp");
 %>

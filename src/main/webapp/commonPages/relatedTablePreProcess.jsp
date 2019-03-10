@@ -4,6 +4,7 @@
 <%@page import="org.bson.Document"%>
 <%@page import="com.mongodb.client.FindIterable"%>
 <%@page import="idream2.main.core.Util"%>
+<%@page import="idream2.main.core.Context"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page import = "java.util.Map" %>
 <%@ page import = "java.util.HashMap" %>
@@ -15,7 +16,6 @@
 	for(String parameter : rParameters.keySet()) {
 		rArgMap.put(parameter, (Object)rParameters.get(parameter)[0]);
 	}
-	System.out.println("=========Start related table 2");
 	
 	String strRAdminTable="";
 	String strRAddMethod="";
@@ -27,7 +27,6 @@
 		strRAddMethod="tableData:getCommonTableData";
 		String strRTableName="common";
 	
-	System.out.println("=========Start related table 3");
 	String[] arrColumnNames = null;
 	String[] arrColumnDisplayNames = null;
 	String strTableTitle = null;
@@ -38,13 +37,8 @@
 	ArrayList<Document> allRDocs = null;
 	try
 	{
-		System.out.println("========="+strRObjectType);
-		System.out.println("========="+strRAdminTable);
-		System.out.println("========="+strRAddMethod.split(":")[0]);
-		System.out.println("========="+strRAddMethod.split(":")[1]);
 		//allDocs  = tableData.getAdminObjectType(docRequest);
 		allRDocs=(ArrayList<Document>)Util.callMethod(strRAddMethod.split(":")[0], strRAddMethod.split(":")[1], rArgMap);
-		System.out.println("=========DONE ");
 	}
 	catch(Exception e)
 	{

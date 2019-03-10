@@ -15,9 +15,12 @@ import idream2.main.core.Util;
 public class formData {
 	public static ArrayList<Document> getFormData(Map<String, Object> docRequest) throws Exception
 	{
+		
+		Context context = null;
+		if(docRequest.get("context")!=null)
+			context = (Context)docRequest.get("context");
 		try
 		{
-			System.out.println("========= Inside getFormData");
 			ArrayList<Document> formData=new ArrayList<Document>();
 			String strParentDataId = (String)docRequest.get("parentDataId");
 			String strObjectType = (String)docRequest.get("objectType");
@@ -28,11 +31,11 @@ public class formData {
 			
 			BasicDBObject findConditionColumns = new BasicDBObject();
 			findConditionColumns.append("_Id", new ObjectId(strParentDataId));
-			FindIterable<Document> docFields = Util.findMany(Context.strCollectionName, findConditionColumns);
+			FindIterable<Document> docFields = Util.findMany(context.getCollectionName(), findConditionColumns, context);
 			
 			BasicDBObject findCondition=new BasicDBObject();
 			findCondition.append("_id", new ObjectId(strParentDataId));
-			Document docData = Util.find(strObjectType, findCondition);
+			Document docData = Util.find(strObjectType, findCondition, context);
 			
 			for (Document doc : docFields) {
 				String strData = (String) docData.get(doc.get("name"));

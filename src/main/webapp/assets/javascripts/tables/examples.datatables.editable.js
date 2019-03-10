@@ -86,22 +86,61 @@ function httpGet(theUrl)
 					debugger;
 					for(i=0; i<rowData.length;i++)
 					{
+						if(rowData[i].className=="int")
+						{
+							columnData=columnData+"i;-"
+						}
+						else if(rowData[i].className=="object")
+						{
+							columnData=columnData+"o;-"
+						}
+						else if(rowData[i].className=="list")
+						{
+							columnData=columnData+"l;-"
+						}
+						
 						if(rowData[i].childNodes.length!=0 && rowData[i].childNodes[0].nodeName=="A")
 						{
-							columnData=columnData+rowData[i].childNodes[0].innerHTML+",";
+							columnData=columnData+rowData[i].childNodes[0].innerHTML+"~";
 						}
 						else if(rowData[i].childNodes[0]==undefined)
 						{
-							columnData=columnData+",";
+							columnData=columnData+"~";
 						}
 						else if(rowData[i].childNodes[0].value==undefined)
 						{
-							columnData=columnData+rowData[i].childNodes[0].data+",";
+							columnData=columnData+rowData[i].childNodes[0].data+"~";
 						}
 						else
 						{
-							columnData=columnData+rowData[i].childNodes[0].value+",";
+							if(rowData[i].className=="object" || rowData[i].className=="list")
+							{
+								var flag=true;
+								if(rowData[i].childNodes[0].value.trim()!="")
+								{
+									if(columnOptionsWithValues[i].indexOf(rowData[i].childNodes[0].value)!=-1)
+									{
+										var arrColumnOptions = columnOptionsWithValues[i].split(',');
+										arrColumnOptions.forEach(function(element) {
+											  if(flag && element.indexOf(rowData[i].childNodes[0].value)!=-1)
+											  {
+												  columnData=columnData+element.split(':')[0]+"~";
+												  flag=false;
+											  }
+										});
+									}
+								}
+								if(flag)
+								{
+									columnData=columnData+"~";
+								}
+							}
+							else
+							{
+								columnData=columnData+rowData[i].childNodes[0].value+"~";
+							}
 						}
+						
 					};
 					var fullURL=document.location.href;
 					var strUrl = "";
@@ -288,8 +327,7 @@ function httpGet(theUrl)
 				'<a href="#" class="hidden on-editing save-row"><i class="fa fa-save"></i></a>',
 				'<a href="#" class="hidden on-editing cancel-row"><i class="fa fa-times"></i></a>',
 				'<a href="#" class="on-default edit-row"><i class="fa fa-pencil"></i></a>',
-				'<a href="#" class="on-default delete-row"><i class="fa fa-trash-o"></i></a>',
-				'<a href="#" class="on-default remove-row"><i class="fa fa-unlink"></i></a>'
+				'<a href="#" class="on-default delete-row"><i class="fa fa-trash-o"></i></a>'
 			].join(' ');
 			
 			var cnt=0;
@@ -342,15 +380,25 @@ function httpGet(theUrl)
 				data;
 			
 			data = this.datatable.row( $row.get(0) ).data();
-
+			
 			$row.children( 'td' ).each(function( i ) {
 				var $this = $( this );
-
+				debugger;
 				if ( $this.hasClass('actions') || $this.hasClass('noEdit')) {
 					_self.rowSetActionsEditing( $row );
 				}
 				else if ($this.hasClass('passwordField')) {
 					$this.html( '<input type="password" class="form-control input-block" value="' + data[i] + '"/>' );
+				}
+				else if ($this.hasClass('list')) {
+					var strOptionData = tableColumnData[i];
+					strOptionData=strOptionData.replace("<option>"+data[i]+"</option>","<option selected>"+data[i]+"</option>");
+					$this.html( '<select class="form-control input-block">'+strOptionData+'</select>' );
+				}
+				else if ($this.hasClass('object')) {
+					var strOptionData = tableColumnData[i];
+					strOptionData=strOptionData.replace("<option>"+data[i]+"</option>","<option selected>"+data[i]+"</option>");
+					$this.html( '<select class="form-control input-block">'+strOptionData+'</select>' );
 				}
 				else {
 					$this.html( '<input type="text" class="form-control input-block" value="' + data[i] + '"/>' );
@@ -377,7 +425,11 @@ function httpGet(theUrl)
 				if ( $this.hasClass('actions') ) {
 					_self.rowSetActionsDefault( $row );
 					return _self.datatable.cell( this ).data();
-				} else {
+				} 
+				else if ( $this.hasClass('list') || $this.hasClass('object') ) {
+					return $.trim( $this.find('select').val() );
+				}  
+				else {
 					return $.trim( $this.find('input').val() );
 				}
 			});

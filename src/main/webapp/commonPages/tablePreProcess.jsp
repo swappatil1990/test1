@@ -9,6 +9,7 @@
 <%@ page import = "java.util.Map" %>
 <%@ page import = "java.util.HashMap" %>
 <%
+
 	/*Document docRequest = new Document();
 	Map<String, String[]> parameters = request.getParameterMap();
 	for(String parameter : parameters.keySet()) {
@@ -24,14 +25,16 @@
 	for(String parameter : parameters.keySet()) {
 		ArgMap.put(parameter, (Object)parameters.get(parameter)[0]);
 	}
+	
+	ArgMap.put("context", contextInner);
+	
 	String strObjectType="";
 	String strAdminTable="";
 	String strAddMethod="";
-	System.out.println("========= Inside table pre PRocess");
 	String strParentDataId=request.getParameter("parentDataId");
 	strObjectType=request.getParameter("objectType");
 	
-	String strLastUrl = Context.getLastHref();
+	String strLastUrl = contextInner.getLastHref();
 	
 	String[] arrColumnNames = null;
 	String[] arrColumnDisplayNames = null;
@@ -40,6 +43,8 @@
 	String JSColumnNames = "";
 	String JSColumnClass= "";
 	String JSColumnProperties = "";
+	String JSColumnData = "";
+	String JSColumnOptionsWithValues = "";
 	ArrayList<Document> allDocs = null;
 	
 	try
@@ -50,31 +55,30 @@
 	{
 		e.printStackTrace();
 	}
-	System.out.println("========= s==================== 1");
 	Document docTableProperties = allDocs.get(0);
 	Document docColumnClass = allDocs.get(1);
 	Document docColumnProperties = allDocs.get(2);
 	Document docColumnDisplayName = allDocs.get(3);
 	Document docColumnNos = allDocs.get(4);
-	System.out.println("========= s====================2");
+	Document docColumnData = allDocs.get(5);
+	
 	arrColumnDisplayNames=new String[docColumnNos.keySet().size()];
 	arrColumnNames=new String[docColumnNos.keySet().size()];
-	System.out.println("========= s==================== 3");
 	int cnt=0;
 	for ( String key : docColumnNos.keySet() ) {
 		arrColumnDisplayNames[cnt] = docColumnDisplayName.getString(key);
 		arrColumnNames[cnt] = key;
+		JSColumnData += "'"+docColumnData.getString(key)+"',";
+		JSColumnOptionsWithValues += "'"+docColumnData.getString(key+"Arr")+"',";
 		JSColumnNames += key+",";
 		JSColumnClass += docColumnClass.getString(key)+",";
 		JSColumnProperties += docColumnProperties.getString(key)+",";
 		cnt++;
 	}
-	System.out.println("========= s==================== 4");
 	JSColumnNames=JSColumnNames.substring(0,JSColumnNames.length()-1);
 	JSColumnClass=JSColumnClass.substring(0,JSColumnClass.length()-1);
 	JSColumnProperties=JSColumnProperties.substring(0,JSColumnProperties.length()-1);
 	
 	strTableTitle = docTableProperties.getString("tableTitle");
 	strPostProcessURL = docTableProperties.getString("postProcessURL");
-	System.out.println("========= s==================== 5");
 %>

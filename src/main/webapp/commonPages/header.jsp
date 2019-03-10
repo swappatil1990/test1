@@ -1,9 +1,12 @@
 <%@page import="idream2.main.core.Context"%>
 <%@page import="idream2.main.core.Util"%>
 <%
+Context context=new Context();
+context.createContextFromSession(session);
+
 String strUserName=(String)session.getAttribute("sessionUserName");
 String strContextId=(String)session.getAttribute("sessionContaxtId");
-if(Util.checkEmpty(strContextId) || !Context.checkContext(strContextId))
+if(Util.checkEmpty(strContextId) || !context.checkContext(strContextId))
 	response.sendRedirect("index.jsp");
 
 %>
@@ -39,7 +42,9 @@ if(Util.checkEmpty(strContextId) || !Context.checkContext(strContextId))
 					<img src="assets/images/!logged-user.jpg" alt="Joseph Doe" class="img-circle" data-lock-picture="assets/images/!logged-user.jpg" />
 				</figure>
 				<div class="profile-info" data-lock-name="John Doe" data-lock-email="johndoe@JSOFT.com">
-					<span class="name"><%=Context.strUser %></span>
+					<span class="name">
+					<%= context.getUserName()%>
+					</span>
 					<span class="role">administrator</span>
 				</div>
 
