@@ -14,8 +14,8 @@ public class Context extends Constants{
 	public String strCollectionName="";
 	public String strDataCollectionName="";
 	public String strSuperAdminCollectionName="id_AdminObjectData";
-	ArrayList<String> arrHrefList=new ArrayList<>();
-	ArrayList<String> arrHrefHeaderList=new ArrayList<>();
+	public ArrayList<String> arrHrefList=new ArrayList<>();
+	public ArrayList<String> arrHrefHeaderList=new ArrayList<>();
 	String strPassword="";
 	public String contextId="";
 	public boolean flagLogin = true;
@@ -73,6 +73,11 @@ public class Context extends Constants{
 	
 	public void setHref(String strHeader, String strHref)
 	{
+		if(arrHrefList==null)
+		{
+			arrHrefHeaderList=new ArrayList<String>();
+			arrHrefList=new ArrayList<String>();
+		}
 		if(!arrHrefList.contains(strHref))
 		{
 			arrHrefHeaderList.add(strHeader);
@@ -117,8 +122,11 @@ public class Context extends Constants{
 	
 	public void clearHref()
 	{
+		if(arrHrefList!=null)
+		{
 		arrHrefHeaderList.clear();
 		arrHrefList.clear();
+		}
 	}
 	
 	public String getDataCollectionName()
@@ -163,10 +171,14 @@ public class Context extends Constants{
 			login(session.getAttribute("sessionUserName").toString(), session.getAttribute("sessionUserPass").toString());
 			strCollectionName = session.getAttribute("strCollectionName").toString();
 			strDataCollectionName = session.getAttribute("strDataCollectionName").toString();
+			arrHrefList = (ArrayList<String>) session.getAttribute("hrefList");
+			arrHrefHeaderList = (ArrayList<String>) session.getAttribute("hrefHeaderList");
+			Util.dbCheck();
 		}
 		catch(Exception e)
 		{
-			throw new Exception("Error in Login Context.....");
+			//throw new Exception("Error in Login Context.....");
+			e.printStackTrace();
 		}
 		//Util.checkSessions();
 	}

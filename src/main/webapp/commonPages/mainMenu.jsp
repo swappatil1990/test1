@@ -28,6 +28,7 @@
 					FindIterable<Document> docsMenuList = ObjectType.getAllSchemaObjectTypesForMenu(context);
 					
 					String strSelectedMenu = request.getParameter("selectedMenu");
+					String lastGroupId = "";
 					for(Document docMenu:docsMenuList)
 					{	
 						String strURL = "";
@@ -39,15 +40,16 @@
 						{
 							strClass+=" nav-active";
 						}
+						
 					%>
 					<li class="<%=strClass%>">
 						<a <%=strURL%>>
 							<i class="<%=  docMenu.get("icon").toString()%>" aria-hidden="true"></i>
 							<span><%= docMenu.get("displayName").toString()%></span>
 						</a>
-						
 					</li>
 					<%
+						
 					}
 					%>
 					

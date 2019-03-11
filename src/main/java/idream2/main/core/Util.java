@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -43,6 +44,11 @@ public class Util extends Constants{
 	{
 		//mongoClient.close();
 		//database=null;
+	}
+	
+	public static void dbCheck()
+	{
+		
 	}
 	
 	public static String insert(String strTable, Document doc, Context context) throws Exception
@@ -256,7 +262,12 @@ public class Util extends Constants{
 		connectedDB();
 		MongoCollection<Document> collection = database.getCollection(strTable);
 		Document docSort=new Document();
-		docSort.append(strSort, 1);
+		String[] arrSortColumns = strSort.split(",");
+		for(String strTmp : arrSortColumns)
+		{
+			docSort.append(strTmp, 1);
+		}
+		
 		FindIterable<Document> collectionResult = collection.find(findCondition).sort(docSort);
 		dbClose();
 		return collectionResult;

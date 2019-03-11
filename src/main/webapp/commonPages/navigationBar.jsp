@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@page import="idream2.main.core.Context"%>
 <%
 
@@ -7,9 +8,21 @@ if(strMainMenu!=null && strMainMenu.equals("true"))
 {
 	context.clearHref();
 	context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
+	ArrayList<String> hrefList = new ArrayList<String>();
+	ArrayList<String> hrefHeaderList = new ArrayList<String>();
+	hrefList.add(request.getRequestURL()+"?"+request.getQueryString());
+	hrefHeaderList.add(strName);
+	session.setAttribute("hrefList",hrefList);
+	session.setAttribute("hrefHeaderList",hrefHeaderList);
 }
 else
 {
+	ArrayList<String> hrefList = context.arrHrefList;
+	ArrayList<String> hrefHeaderList = context.arrHrefHeaderList;
+	hrefList.add(request.getRequestURL()+"?"+request.getQueryString());
+	hrefHeaderList.add(strName);
+	session.setAttribute("hrefList",hrefList);
+	session.setAttribute("hrefHeaderList",hrefHeaderList);
 	context.setHref(strName,request.getRequestURL()+"?"+request.getQueryString());
 }
 

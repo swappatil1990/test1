@@ -24,7 +24,7 @@ public class ObjectType extends Constants{
 		BasicDBObject findColumns=new BasicDBObject();
 		findColumns.append("type", "Objects");
 		findColumns.append("displayMainMenu", "true");
-		FindIterable<Document> docColumns = Util.findManyWithSort(context.getCollectionName(), findColumns, "sequence", context);
+		FindIterable<Document> docColumns = Util.findManyWithSort(context.getCollectionName(), findColumns, "sequence,groupName", context);
 		
 		return docColumns;
 	}
